@@ -1,0 +1,67 @@
+#library "invasion"
+#include "zcommon.acs"
+
+#libdefine INVALID_STATE -1
+#libdefine WAVE_IDLE 0
+#libdefine WAVE_COUNTDOWN 1
+#libdefine WAVE_STARTED 2
+
+function void StartInvasion(int gameLength, int waveDelay)
+{
+	ScriptCall("Invasion", "StartGame", gameLength, waveDelay);
+}
+
+function void PauseInvasion(bool val)
+{
+	ScriptCall("Invasion", "PauseGame", val);
+}
+
+function bool InvasionPaused(void)
+{
+	return ScriptCall("Invasion", "GetGamePaused");
+}
+
+function bool InvasionStarted(void)
+{
+	return ScriptCall("Invasion", "GetGameStarted");
+}
+
+function bool InvasionEnded(void)
+{
+	return ScriptCall("Invasion", "GetGameEnded");
+}
+
+function int GameLength(void)
+{
+	return ScriptCall("Invasion", "GetGameLength");
+}
+
+function int WaveState(void)
+{
+	return ScriptCall("Invasion", "GetGameState");
+}
+
+function int GetWave(void)
+{
+	return ScriptCall("Invasion", "GetCurrentWave");
+}
+
+function bool WaveStarted(void)
+{
+	return ScriptCall("Invasion", "GetWaveStarted");
+}
+
+function bool WaveEnded(void)
+{
+	return ScriptCall("Invasion", "GetWaveEnded");
+}
+
+function int RemainingEnemies(void)
+{
+	return ScriptCall("Invasion", "GetRemainingEnemies");
+}
+
+function void PauseSpawner(int tid, bool val)
+{
+	ScriptCall("Invasion", "PauseSpawners", tid, val);
+}

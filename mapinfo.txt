@@ -1,0 +1,30 @@
+GameInfo
+{
+	AddEventHandlers = "Invasion"
+}
+
+DoomEdNums
+{
+	23400 = PossessedSpawner
+	23401 = LightMonsterSpawner
+	23402 = HeavyMonsterSpawner
+	23403 = BossSpawner
+	
+	23404 = GruntSpawner
+	23405 = SergeantSpawner
+	23406 = CommandoSpawner
+	23407 = ImpSpawner
+	23408 = DemonSpawner
+	23409 = SpectreSpawner
+	23410 = LostSoulSpawner
+	23411 = RevenantSpawner
+	23412 = CacodemonSpawner
+	23413 = PainElementalSpawner
+	23414 = HellKnightSpawner
+	23415 = ArachnotronSpawner
+	23416 = FatsoSpawner
+	23417 = ArchvileSpawner
+	23418 = BaronSpawner
+	23419 = CyberdemonSpawner
+	23420 = MastermindSpawner
+}
