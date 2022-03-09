@@ -106,9 +106,9 @@ class Invasion : EventHandler
 		while (inv = InvasionSpawner(it.Next()))
 		{
 			int add = 0;
-			if (!inv.bDormant && inv.RemainingSpawns() > 0 && inv.InWaveRange(wave))
+			if (!inv.bDormant && inv.InWaveRange(wave))
 			{
-				add = inv.args[SPAWN_LIMIT];
+				add = inv.RemainingSpawns();
 				let di = inv.GetDropItems();
 				while (di)
 				{

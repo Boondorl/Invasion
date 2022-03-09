@@ -17,7 +17,11 @@ enum EFlags
 	FL_DELAY = 1<<4,
 	FL_HALF = 1<<5,
 	FL_DOUBLE = 1<<6,
-	FL_QUADRUPLE = 1<<7
+	FL_QUADRUPLE = 1<<7,
+	FL_SILENT = 1<<8,
+	FL_WAVE = 1<<9,
+	FL_DIFFICULTY = 1<<10,
+	FL_PLAYER = 1<<11
 }
 
 class InvasionSpawner : Actor abstract
@@ -39,7 +43,7 @@ class InvasionSpawner : Actor abstract
 		//$Arg2Tooltip The delay in tics (35 per second) between spawns
 		//$Arg3 Spawn Limit
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Use inital spawn delay"; 32 = "Halve intial spawn delay"; 64 = "Double initial spawn delay"; 128 = "Quadruple initial spawn delay"; }
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Use inital spawn delay"; 32 = "Halve intial spawn delay"; 64 = "Double initial spawn delay"; 128 = "Quadruple initial spawn delay"; 256 = "No teleport fog"; 512 = "Scale with wave"; 1024 = "Scale with difficulty"; 2048 = "Scale with players"; }
 		//$Arg4Type 12
 		
 		FloatBobPhase 0;
@@ -65,7 +69,7 @@ class InvasionSpawner : Actor abstract
 		super.PostBeginPlay();
 		
 		timer = GetSpawnDelay();
-		spawnLimit = args[SPAWN_LIMIT];
+		spawnLimit = GetSpawnAmount(1);
 		mode = Invasion.GetMode();
 	}
 	
@@ -95,7 +99,7 @@ class InvasionSpawner : Actor abstract
 			if (!(args[FLAGS] & FL_ALWAYS))
 				timer = GetSpawnDelay();
 			if (args[flags] & FL_RESET)
-				spawnLimit = args[SPAWN_LIMIT];
+				spawnLimit = GetSpawnAmount(mode.CurrentWave());
 		}
 		
 		if ((args[FLAGS] & FL_SEQUENCE) && target)
@@ -166,13 +170,17 @@ class InvasionSpawner : Actor abstract
 		{
 			if (mo)
 			{
-				let tf = Spawn("TeleportFog", mo.pos);
-				if (tf)
+				mo.bNeverRespawn = true;
+				if (!(args[FLAGS] & FL_SILENT))
 				{
-					if (tf.pos.z < tf.floorz)
-						tf.SetZ(tf.floorz);
-					
-					tf.target = mo;
+					let tf = Spawn("TeleportFog", mo.pos);
+					if (tf)
+					{
+						if (tf.pos.z < tf.floorz)
+							tf.SetZ(tf.floorz);
+						
+						tf.target = mo;
+					}
 				}
 			}
 			
@@ -188,6 +196,54 @@ class InvasionSpawner : Actor abstract
 		else
 			timer = TICRATE; // keep retrying every second
 		
+	}
+	
+	clearscope int GetSpawnAmount(int wave) const
+	{
+		int s = args[SPAWN_LIMIT];
+		if (s <= 0)
+			return 0;
+		else if (s == 1)
+			return 1;
+		
+		if (args[FLAGS] & FL_WAVE)
+		{
+			int multi = max(0, health > 0 ? wave-health : wave-1);
+			s += s*0.15*multi;
+		}
+		
+		if (args[FLAGS] & FL_DIFFICULTY)
+		{
+			int skill = 1 + log(G_SkillPropertyInt(SKILLP_SpawnFilter)) / log(2);
+			double multi;
+			if (skill < 3)
+			{
+				multi = 1 / (1 + 0.25*(3-skill));
+				s = ceil(s - s*(1-multi));
+			}
+			else
+			{
+				multi = max(0, skill - 3);
+				s += s*0.25*multi;
+			}
+		}
+		
+		if (args[FLAGS] & FL_PLAYER)
+		{
+			int count;
+			for (uint i = 0; i < MAXPLAYERS; ++i)
+			{
+				if (!playerInGame[i])
+					continue;
+				
+				++count;
+			}
+			
+			int multi = max(0, count-1);
+			s += s*0.3*multi;
+		}
+		
+		return s;
 	}
 	
 	clearscope int GetSpawnDelay() const
