@@ -12,7 +12,12 @@ enum EFlags
 	FL_NONE = 0,
 	FL_RESET = 1,
 	FL_ALWAYS = 1<<1,
-	FL_SEQUENCE = 1<<2
+	FL_SEQUENCE = 1<<2,
+	FL_WAIT = 1<<3,
+	FL_DELAY = 1<<4,
+	FL_HALF = 1<<5,
+	FL_DOUBLE = 1<<6,
+	FL_QUADRUPLE = 1<<7
 }
 
 class InvasionSpawner : Actor abstract
@@ -26,7 +31,7 @@ class InvasionSpawner : Actor abstract
 	{
 		//$Arg0 Spawn Script
 		//$Arg0Str
-		//$Arg0Tooltip If a script name or number is provided, execute this when the Actor is spawned
+		//$Arg0Tooltip If a script name or number is provided, execute this when an Actor is spawned
 		//$Arg1 Actor TID
 		//$Arg1Tooltip The TID to give spawned Actors
 		//$Arg2 Spawn Delay
@@ -34,13 +39,13 @@ class InvasionSpawner : Actor abstract
 		//$Arg2Tooltip The delay in tics (35 per second) between spawns
 		//$Arg3 Spawn Limit
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Sequential spawning"; }
-		//$Arg4Default 1
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Use inital spawn delay"; 32 = "Halve intial spawn delay"; 64 = "Double initial spawn delay"; 128 = "Quadruple initial spawn delay"; }
 		//$Arg4Type 12
 		
 		FloatBobPhase 0;
 		Radius 0;
 		Height 0;
+		Health 1;
 		
 		+SYNCHRONIZED
 		+NOBLOCKMAP
@@ -59,6 +64,7 @@ class InvasionSpawner : Actor abstract
 	{
 		super.PostBeginPlay();
 		
+		timer = GetSpawnDelay();
 		spawnLimit = args[SPAWN_LIMIT];
 		mode = Invasion.GetMode();
 	}
@@ -87,7 +93,7 @@ class InvasionSpawner : Actor abstract
 		if (mode.WaveEnded())
 		{
 			if (!(args[FLAGS] & FL_ALWAYS))
-				timer = 0;
+				timer = GetSpawnDelay();
 			if (args[flags] & FL_RESET)
 				spawnLimit = args[SPAWN_LIMIT];
 		}
@@ -104,8 +110,14 @@ class InvasionSpawner : Actor abstract
 			}
 		}
 		
-		if (bDestroyed || bDormant || bPaused || (mode.GameState() != GS_ACTIVE && !(args[FLAGS] & FL_ALWAYS)) || IsFrozen())
+		if (bDestroyed || bDormant || bPaused
+			|| (health > 0 && mode.CurrentWave() < health)
+			|| (mode.GameState() != GS_ACTIVE && !(args[FLAGS] & FL_ALWAYS))
+			|| ((args[FLAGS] & FL_WAIT) && mode.RemainingEnemies() > mode.SpawnThreshold())
+			|| IsFrozen())
+		{
 			return;
+		}
 		
 		if ((args[SPAWN_LIMIT] <= 0 || spawnLimit > 0) && (!(args[FLAGS] & FL_SEQUENCE) || !target) && --timer <= 0)
 			SpawnActor();
@@ -176,6 +188,27 @@ class InvasionSpawner : Actor abstract
 		else
 			timer = TICRATE; // keep retrying every second
 		
+	}
+	
+	clearscope int GetSpawnDelay() const
+	{
+		if (!(args[FLAGS] & FL_DELAY))
+			return 0;
+		
+		int d = args[SPAWN_DELAY];
+		if (args[FLAGS] & FL_DOUBLE)
+			d *= 2;
+		if (args[FLAGS] & FL_QUADRUPLE)
+			d *= 4;
+		if (args[FLAGS] & FL_HALF)
+			d /= 2;
+		
+		return d;
+	}
+	
+	clearscope bool HasSpawns() const
+	{
+		return args[SPAWN_LIMIT] <= 0 || spawnLimit > 0;
 	}
 	
 	clearscope bool Paused() const

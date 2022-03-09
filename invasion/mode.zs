@@ -21,6 +21,7 @@ class Invasion : EventHandler
 	
 	private int modeState;
 	private int enemies;
+	private int waitEnemies;
 	private int wave;
 	private int timer;
 	
@@ -101,11 +102,11 @@ class Invasion : EventHandler
 	{
 		let it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
 		InvasionSpawner inv;
-		int counter;
+		int counter, waitCounter;
 		while (inv = InvasionSpawner(it.Next()))
 		{
 			int add = 0;
-			if (!inv.bDormant && inv.args[SPAWN_LIMIT] > 0)
+			if (!inv.bDormant && inv.args[SPAWN_LIMIT] > 0 && inv.HasSpawns() && (inv.health <= 0 || wave >= inv.health))
 			{
 				add = inv.args[SPAWN_LIMIT];
 				let di = inv.GetDropItems();
@@ -131,9 +132,12 @@ class Invasion : EventHandler
 			}
 			
 			counter += add;
+			if (!(inv.args[FLAGS] & FL_WAIT))
+				waitCounter += add;
 		}
 		
 		enemies = counter;
+		waitEnemies = max(0, counter - waitCounter);
 	}
 	
 	protected void ClearMonsters()
@@ -151,7 +155,7 @@ class Invasion : EventHandler
 			}
 		}
 		
-		enemies = 0;
+		enemies = waitEnemies = 0;
 	}
 	
 	override void WorldThingDied(WorldEvent e)
@@ -233,6 +237,11 @@ class Invasion : EventHandler
 	clearscope int RemainingEnemies() const
 	{
 		return enemies;
+	}
+	
+	clearscope int SpawnThreshold() const
+	{
+		return waitEnemies;
 	}
 	
 	clearscope int CurrentWave() const
