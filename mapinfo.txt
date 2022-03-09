@@ -27,4 +27,44 @@ DoomEdNums
 	23418 = BaronSpawner
 	23419 = CyberdemonSpawner
 	23420 = MastermindSpawner
+	
+	23421 = WeaponSpawner
+	23422 = SmallAmmoSpawner
+	23423 = LargeAmmoSpawner
+	
+	23424 = ChainsawSpawner
+	23425 = PistolSpawner
+	23426 = ShotgunSpawner
+	23427 = SuperShotgunSpawner
+	23428 = ChaingunSpawner
+	23429 = RocketLauncherSpawner
+	23430 = PlasmaRifleSpawner
+	23431 = BFG9000Spawner
+	
+	23432 = BackpackSpawner
+	23433 = ClipSpawner
+	23434 = ClipBoxSpawner
+	23435 = ShellSpawner
+	23436 = ShellBoxSpawner
+	23437 = RocketSpawner
+	23438 = RocketBoxSpawner
+	23439 = CellSpawner
+	23440 = CellPackSpawner
+	
+	23441 = SoulsphereSpawner
+	23442 = MegasphereSpawner
+	23443 = InvulnerabilitySpawner
+	23444 = BlurSphereSpawner
+	23445 = RadSuitSpawner
+	23446 = InfraredSpawner
+	23447 = AllmapSpawner
+	23448 = BerserkSpawner
+	
+	23449 = HealthBonusSpawner
+	23450 = StimpackSpawner
+	23451 = MedikitSpawner
+	
+	23452 = ArmorBonusSpawner
+	23453 = GreenArmorSpawner
+	23454 = BlueArmorSpawner
 }

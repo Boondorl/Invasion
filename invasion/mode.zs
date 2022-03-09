@@ -155,7 +155,7 @@ class Invasion : EventHandler
 	
 	override void WorldThingDied(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || e.thing.default.bFriendly)
+		if (!e.thing || !e.thing.bIsMonster)
 			return;
 		
 		--enemies;
@@ -163,10 +163,18 @@ class Invasion : EventHandler
 	
 	override void WorldThingDestroyed(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || e.thing.default.bFriendly || e.thing.health <= 0)
+		if (!e.thing || !e.thing.bIsMonster || e.thing.health <= 0)
 			return;
 		
 		--enemies;
+	}
+	
+	override void WorldThingRevived(WorldEvent e)
+	{
+		if (!e.thing || !e.thing.bIsMonster)
+			return;
+		
+		++enemies;
 	}
 	
 	override void RenderOverlay(RenderEvent e)

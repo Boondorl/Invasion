@@ -81,6 +81,9 @@ class InvasionSpawner : Actor abstract
 			return;
 		}
 		
+		if (!mode.Started())
+			return;
+		
 		if (mode.WaveEnded())
 		{
 			if (!(args[FLAGS] & FL_ALWAYS))
@@ -104,7 +107,7 @@ class InvasionSpawner : Actor abstract
 		if (bDestroyed || bDormant || bPaused || (mode.GameState() != GS_ACTIVE && !(args[FLAGS] & FL_ALWAYS)) || IsFrozen())
 			return;
 		
-		if ((spawnLimit > 0 || args[SPAWN_LIMIT] <= 0) && --timer <= 0 && (!(args[FLAGS] & FL_SEQUENCE) || !target))
+		if ((args[SPAWN_LIMIT] <= 0 || spawnLimit > 0) && (!(args[FLAGS] & FL_SEQUENCE) || !target) && --timer <= 0)
 			SpawnActor();
 	}
 	
@@ -151,10 +154,6 @@ class InvasionSpawner : Actor abstract
 		{
 			if (mo)
 			{
-				let i = Inventory(mo);
-				if (i)
-					i.bTossed = true;
-				
 				let tf = Spawn("TeleportFog", mo.pos);
 				if (tf)
 				{

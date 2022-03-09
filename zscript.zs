@@ -4,5 +4,8 @@ version "4.7"
 #include "invasion/mode.zs"
 #include "invasion/spawner.zs"
 
-// wrappers
+// Doom wrappers
 #include "invasion/spawners/monsterspawner.zs"
+#include "invasion/spawners/ammospawner.zs"
+#include "invasion/spawners/healthspawner.zs"
+#include "invasion/spawners/powerupspawner.zs"
