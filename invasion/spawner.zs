@@ -203,13 +203,13 @@ class InvasionSpawner : Actor abstract
 		int s = args[SPAWN_LIMIT];
 		if (s <= 0)
 			return 0;
-		else if (s == 1)
+		if (s == 1)
 			return 1;
 		
 		if (args[FLAGS] & FL_WAVE)
 		{
 			int multi = max(0, health > 0 ? wave-health : wave-1);
-			s += s*0.15*multi;
+			s += args[SPAWN_LIMIT]*0.2*multi;
 		}
 		
 		if (args[FLAGS] & FL_DIFFICULTY)
@@ -219,12 +219,12 @@ class InvasionSpawner : Actor abstract
 			if (skill < 3)
 			{
 				multi = 1 / (1 + 0.25*(3-skill));
-				s = ceil(s - s*(1-multi));
+				s = ceil(s - args[SPAWN_LIMIT]*(1-multi));
 			}
 			else
 			{
 				multi = max(0, skill - 3);
-				s += s*0.25*multi;
+				s += args[SPAWN_LIMIT]*0.25*multi;
 			}
 		}
 		
@@ -240,7 +240,7 @@ class InvasionSpawner : Actor abstract
 			}
 			
 			int multi = max(0, count-1);
-			s += s*0.3*multi;
+			s += args[SPAWN_LIMIT]*0.3*multi;
 		}
 		
 		return s;

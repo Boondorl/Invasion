@@ -7,7 +7,7 @@ enum EModeStates
 	GS_END
 }
 
-const COUNTDOWN_TIME = Thinker.TICRATE * 10;
+const COUNTDOWN_TIME = Thinker.TICRATE * 5;
 
 class Invasion : EventHandler
 {
@@ -27,10 +27,10 @@ class Invasion : EventHandler
 	
 	override void WorldTick()
 	{
+		bWaveStarted = bWaveEnded = false;
 		if (!bStarted || bPaused)
 			return;
 		
-		bWaveStarted = bWaveEnded = false;
 		switch (modeState)
 		{
 			case GS_IDLE:
@@ -44,61 +44,35 @@ class Invasion : EventHandler
 			case GS_ACTIVE:
 				DoActive();
 				break;
-				
-			case GS_END:
-				DoEnd();
-				break;
 		}
 	}
 	
-	virtual void DoIdle()
+	private void DoIdle()
 	{
 		--timer;
 		if (timer <= 0)
-		{
-			modeState = GS_ACTIVE;
-			bWaveStarted = true;
-			UpdateMonsterCount();
-		}
-		else if (timer < COUNTDOWN_TIME)
+			WaveStart();
+		else if (timer <= COUNTDOWN_TIME)
 			modeState = GS_COUNTDOWN;
 	}
 	
-	virtual void DoCountDown()
+	private void DoCountDown()
 	{
 		--timer;
 		if (timer <= 0)
-		{
-			modeState = GS_ACTIVE;
-			bWaveStarted = true;
-			UpdateMonsterCount();
-		}
-		else if (timer >= COUNTDOWN_TIME)
+			WaveStart();
+		else if (timer > COUNTDOWN_TIME)
 			modeState = GS_IDLE;
 	}
 	
-	virtual void DoActive()
+	private void DoActive()
 	{
 		timer = 0;
 		if (enemies <= 0)
-		{
-			if (wave >= length)
-				modeState = GS_END;
-			else
-			{
-				modeState = GS_IDLE;
-				bWaveEnded = true;
-				timer = waveTimer;
-				++wave;
-			}
-			
-			ClearMonsters();
-		}
+			WaveEnd();
 	}
 	
-	virtual void DoEnd() {}
-	
-	protected void UpdateMonsterCount()
+	private void UpdateMonsterCount()
 	{
 		let it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
 		InvasionSpawner inv;
@@ -140,7 +114,7 @@ class Invasion : EventHandler
 		waitEnemies = max(0, counter - waitCounter);
 	}
 	
-	protected void ClearMonsters()
+	private void ClearMonsters()
 	{
 		let it = ThinkerIterator.Create("Actor", Thinker.STAT_DEFAULT);
 		Actor mo;
@@ -199,13 +173,13 @@ class Invasion : EventHandler
 			y += height;
 		}
 		
-		if (!bPaused)
+		if (!bPaused || (modeState == GS_ACTIVE && enemies > 0))
 		{
 			string text;
 			switch (modeState)
 			{
 				case GS_IDLE:
-					text = String.Format("Next wave in %d seconds", timer / TICRATE);
+					text = String.Format("Next wave in %d seconds", ceil(double(timer) / TICRATE));
 					break;
 					
 				case GS_COUNTDOWN:
@@ -217,7 +191,7 @@ class Invasion : EventHandler
 					break;
 					
 				case GS_END:
-					text = "Completed!";
+					text = "Invasion defeated!";
 					break;
 			}
 			
@@ -227,7 +201,7 @@ class Invasion : EventHandler
 			if (modeState == GS_COUNTDOWN)
 			{
 				y += height;
-				string counter = String.Format("%d", timer / TICRATE);
+				string counter = String.Format("%d", ceil(double(timer) / TICRATE));
 				x = w - bigfont.StringWidth(counter)*scale.x;
 				Screen.DrawText(bigfont, -1, x, y, counter, DTA_ScaleX, scale.x*2, DTA_ScaleY, scale.y*2);
 			}
