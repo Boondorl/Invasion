@@ -89,8 +89,9 @@ class Invasion : EventHandler
 				bWaveEnded = true;
 				timer = waveTimer;
 				++wave;
-				ClearMonsters();
 			}
+			
+			ClearMonsters();
 		}
 	}
 	
@@ -285,9 +286,55 @@ class Invasion : EventHandler
 		timer = waveTimer = t;
 	}
 	
+	void End()
+	{
+		if (!bStarted)
+			return;
+		
+		wave = length;
+		timer = 0;
+		modeState = GS_END;
+	}
+	
 	void Pause(bool val)
 	{
 		bPaused = val;
+	}
+	
+	void WaveStart()
+	{
+		if (!bStarted)
+			return;
+		
+		if (modeState == GS_IDLE || modeState == GS_COUNTDOWN)
+		{
+			timer = 0;
+			modeState = GS_ACTIVE;
+			bWaveStarted = true;
+			UpdateMonsterCount();
+		}
+	}
+	
+	void WaveEnd()
+	{
+		if (!bStarted)
+			return;
+		
+		if (modeState == GS_ACTIVE)
+		{
+			timer = 0;
+			if (wave >= length)
+				modeState = GS_END;
+			else
+			{
+				modeState = GS_IDLE;
+				bWaveEnded = true;
+				timer = waveTimer;
+				++wave;
+			}
+			
+			ClearMonsters();
+		}
 	}
 	
 	// ACS Helpers
@@ -384,11 +431,32 @@ class Invasion : EventHandler
 			inv.Start(length, timer);
 	}
 	
+	static void EndGame()
+	{
+		let inv = Invasion.GetMode();
+		if (inv)
+			inv.End();
+	}
+	
 	static void PauseGame(bool val)
 	{
 		let inv = Invasion.GetMode();
 		if (inv)
 			inv.Pause(val);
+	}
+	
+	static void StartWave()
+	{
+		let inv = Invasion.GetMode();
+		if (inv)
+			inv.WaveStart();
+	}
+	
+	static void EndWave()
+	{
+		let inv = Invasion.GetMode();
+		if (inv)
+			inv.WaveEnd();
 	}
 	
 	static void PauseSpawners(int tid, bool val)

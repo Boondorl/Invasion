@@ -30,7 +30,7 @@ class InvasionSpawner : Actor abstract
 		//$Arg1 Actor TID
 		//$Arg1Tooltip The TID to give spawned Actors
 		//$Arg2 Spawn Delay
-		//$Arg2Default 105
+		//$Arg2Default 70
 		//$Arg2Tooltip The delay in tics (35 per second) between spawns
 		//$Arg3 Spawn Limit
 		//$Arg4 Flags

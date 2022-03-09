@@ -11,6 +11,11 @@ function void StartInvasion(int gameLength, int waveDelay)
 	ScriptCall("Invasion", "StartGame", gameLength, waveDelay);
 }
 
+function void EndInvasion(void)
+{
+	ScriptCall("Invasion", "EndGame");
+}
+
 function void PauseInvasion(bool val)
 {
 	ScriptCall("Invasion", "PauseGame", val);
@@ -54,6 +59,16 @@ function bool WaveStarted(void)
 function bool WaveEnded(void)
 {
 	return ScriptCall("Invasion", "GetWaveEnded");
+}
+
+function void StartWave(void)
+{
+	ScriptCall("Invasion", "StartWave");
+}
+
+function void EndWave(void)
+{
+	ScriptCall("Invasion", "EndWave");
 }
 
 function int RemainingEnemies(void)
