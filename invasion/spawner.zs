@@ -111,7 +111,7 @@ class InvasionSpawner : Actor abstract
 		}
 		
 		if (bDestroyed || bDormant || bPaused
-			|| (health > 0 && mode.CurrentWave() < health)
+			|| !InWaveRange(mode.CurrentWave())
 			|| (mode.GameState() != GS_ACTIVE && !(args[FLAGS] & FL_ALWAYS))
 			|| ((args[FLAGS] & FL_WAIT) && mode.RemainingEnemies() > mode.SpawnThreshold())
 			|| IsFrozen())
@@ -206,9 +206,14 @@ class InvasionSpawner : Actor abstract
 		return d;
 	}
 	
-	clearscope bool HasSpawns() const
+	clearscope bool InWaveRange(int wave) const
 	{
-		return args[SPAWN_LIMIT] <= 0 || spawnLimit > 0;
+		return (health <= 0 || wave >= health) && (score <= 0 || wave < score);
+	}
+	
+	clearscope int RemainingSpawns() const
+	{
+		return spawnLimit;
 	}
 	
 	clearscope bool Paused() const

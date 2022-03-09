@@ -60,7 +60,7 @@ class Invasion : EventHandler
 			bWaveStarted = true;
 			UpdateMonsterCount();
 		}
-		else if (timer <= COUNTDOWN_TIME)
+		else if (timer < COUNTDOWN_TIME)
 			modeState = GS_COUNTDOWN;
 	}
 	
@@ -73,7 +73,7 @@ class Invasion : EventHandler
 			bWaveStarted = true;
 			UpdateMonsterCount();
 		}
-		else if (timer > COUNTDOWN_TIME)
+		else if (timer >= COUNTDOWN_TIME)
 			modeState = GS_IDLE;
 	}
 	
@@ -106,7 +106,7 @@ class Invasion : EventHandler
 		while (inv = InvasionSpawner(it.Next()))
 		{
 			int add = 0;
-			if (!inv.bDormant && inv.args[SPAWN_LIMIT] > 0 && inv.HasSpawns() && (inv.health <= 0 || wave >= inv.health))
+			if (!inv.bDormant && inv.RemainingSpawns() > 0 && inv.InWaveRange(wave))
 			{
 				add = inv.args[SPAWN_LIMIT];
 				let di = inv.GetDropItems();
@@ -187,14 +187,15 @@ class Invasion : EventHandler
 		if (!bStarted || modeState == GS_INVALID)
 			return;
 		
-		int height = bigfont.GetHeight() * 2.4;
+		Vector2 scale = (2,2.4) * (Screen.GetHeight() / 1080.);		
+		int height = bigfont.GetHeight() * scale.y;
 		int w = Screen.GetWidth() / 2;
 		int x, y;
 		if (modeState != GS_END)
 		{
 			string waveCount = String.Format("Wave %d of %d", wave, length);
-			x = w - bigfont.StringWidth(waveCount);
-			Screen.DrawText(bigfont, -1, x, y, waveCount, DTA_ScaleX, 2, DTA_ScaleY, 2.4);
+			x = w - bigfont.StringWidth(waveCount)*scale.x/2;
+			Screen.DrawText(bigfont, -1, x, y, waveCount, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
 			y += height;
 		}
 		
@@ -220,15 +221,15 @@ class Invasion : EventHandler
 					break;
 			}
 			
-			x = w - bigfont.StringWidth(text);
-			Screen.DrawText(bigfont, -1, x, y, text, DTA_ScaleX, 2, DTA_ScaleY, 2.4);
+			x = w - bigfont.StringWidth(text)*scale.x/2;
+			Screen.DrawText(bigfont, -1, x, y, text, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
 			
 			if (modeState == GS_COUNTDOWN)
 			{
 				y += height;
 				string counter = String.Format("%d", timer / TICRATE);
-				x = w - bigfont.StringWidth(counter)*2;
-				Screen.DrawText(bigfont, -1, x, y, counter, DTA_ScaleX, 4, DTA_ScaleY, 4.8);
+				x = w - bigfont.StringWidth(counter)*scale.x;
+				Screen.DrawText(bigfont, -1, x, y, counter, DTA_ScaleX, scale.x*2, DTA_ScaleY, scale.y*2);
 			}
 		}
 	}
