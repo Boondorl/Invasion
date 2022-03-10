@@ -1,68 +1,71 @@
 enum EModeStates
 {
 	GS_INVALID = -1,
-	GS_IDLE,
+	GS_WAITING,
+	GS_ENDED,
 	GS_COUNTDOWN,
 	GS_ACTIVE,
-	GS_END
+	GS_VICTORY
 }
 
 const COUNTDOWN_TIME = Thinker.TICRATE * 5;
+const VICTORY_TIME = Thinker.TICRATE * 3;
 
 class Invasion : EventHandler
 {
 	private bool bStarted;
 	private bool bPaused;
-	private bool bWaveEnded;
 	private bool bWaveStarted;
-	
+	private bool bWaveFinished;
+	private bool bCountSpawn;
 	private int length;
 	private int waveTimer;
-	
 	private int modeState;
+	
 	private int enemies;
-	private int waitEnemies;
+	private int lastSpawnThreshold;
 	private int wave;
 	private int timer;
 	
 	override void WorldTick()
 	{
-		bWaveStarted = bWaveEnded = false;
+		bWaveStarted = bWaveFinished = false;
 		if (!bStarted || bPaused)
 			return;
 		
 		switch (modeState)
 		{
-			case GS_IDLE:
-				DoIdle();
+			case GS_VICTORY:
+				DoVictory();
 				break;
 				
 			case GS_COUNTDOWN:
-				DoCountDown();
+				DoCountdown();
 				break;
-				
+			
 			case GS_ACTIVE:
 				DoActive();
 				break;
 		}
 	}
 	
-	private void DoIdle()
+	private void DoVictory()
 	{
 		--timer;
 		if (timer <= 0)
-			WaveStart();
-		else if (timer <= COUNTDOWN_TIME)
+		{
+			timer = waveTimer;
+			bWaveFinished = true;
+			++wave;
 			modeState = GS_COUNTDOWN;
+		}
 	}
 	
-	private void DoCountDown()
+	private void DoCountdown()
 	{
 		--timer;
 		if (timer <= 0)
 			WaveStart();
-		else if (timer > COUNTDOWN_TIME)
-			modeState = GS_IDLE;
 	}
 	
 	private void DoActive()
@@ -72,11 +75,11 @@ class Invasion : EventHandler
 			WaveEnd();
 	}
 	
-	private void UpdateMonsterCount()
+	void UpdateMonsterCount()
 	{
 		let it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
 		InvasionSpawner inv;
-		int counter, waitCounter;
+		int counter, thresholdCounter;
 		while (inv = InvasionSpawner(it.Next()))
 		{
 			int add = 0;
@@ -106,15 +109,15 @@ class Invasion : EventHandler
 			}
 			
 			counter += add;
-			if (!(inv.args[FLAGS] & FL_WAIT))
-				waitCounter += add;
+			if (!(inv.args[FLAGS] & FL_WAITMONST))
+				thresholdCounter += add;
 		}
 		
 		enemies = counter;
-		waitEnemies = max(0, counter - waitCounter);
+		lastSpawnThreshold = max(0, counter - thresholdCounter);
 	}
 	
-	private void ClearMonsters()
+	void ClearMonsters()
 	{
 		let it = ThinkerIterator.Create("Actor", Thinker.STAT_DEFAULT);
 		Actor mo;
@@ -129,7 +132,28 @@ class Invasion : EventHandler
 			}
 		}
 		
-		enemies = waitEnemies = 0;
+		enemies = lastSpawnThreshold = 0;
+	}
+	
+	void CountMonster(bool val)
+	{
+		bCountSpawn = val;
+	}
+	
+	override void WorldThingSpawned(WorldEvent e)
+	{
+		if (!e.thing || !e.thing.bIsMonster || !bCountSpawn)
+			return;
+		
+		++enemies;
+	}
+	
+	override void WorldThingRevived(WorldEvent e)
+	{
+		if (!e.thing || !e.thing.bIsMonster)
+			return;
+		
+		++enemies;
 	}
 	
 	override void WorldThingDied(WorldEvent e)
@@ -148,14 +172,6 @@ class Invasion : EventHandler
 		--enemies;
 	}
 	
-	override void WorldThingRevived(WorldEvent e)
-	{
-		if (!e.thing || !e.thing.bIsMonster)
-			return;
-		
-		++enemies;
-	}
-	
 	override void RenderOverlay(RenderEvent e)
 	{
 		if (!bStarted || modeState == GS_INVALID)
@@ -165,7 +181,7 @@ class Invasion : EventHandler
 		int height = bigfont.GetHeight() * scale.y;
 		int w = Screen.GetWidth() / 2;
 		int x, y;
-		if (modeState != GS_END)
+		if (modeState != GS_ENDED)
 		{
 			string waveCount = String.Format("Wave %d of %d", wave, length);
 			x = w - bigfont.StringWidth(waveCount)*scale.x/2;
@@ -178,19 +194,22 @@ class Invasion : EventHandler
 			string text;
 			switch (modeState)
 			{
-				case GS_IDLE:
-					text = String.Format("Next wave in %d seconds", ceil(double(timer) / TICRATE));
-					break;
-					
 				case GS_COUNTDOWN:
-					text = "Prepare for battle!";
+					if (timer <= COUNTDOWN_TIME)
+						text = "Prepare for battle!";
+					else
+						text = String.Format("Next wave in %d seconds", ceil(double(timer) / TICRATE));
 					break;
 					
 				case GS_ACTIVE:
 					text = String.Format("%d enemies remaining", enemies);
 					break;
 					
-				case GS_END:
+				case GS_VICTORY:
+					text = "Wave defeated!";
+					break;
+					
+				case GS_ENDED:
 					text = "Invasion defeated!";
 					break;
 			}
@@ -198,7 +217,7 @@ class Invasion : EventHandler
 			x = w - bigfont.StringWidth(text)*scale.x/2;
 			Screen.DrawText(bigfont, -1, x, y, text, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
 			
-			if (modeState == GS_COUNTDOWN)
+			if (modeState == GS_COUNTDOWN && timer <= COUNTDOWN_TIME)
 			{
 				y += height;
 				string counter = String.Format("%d", ceil(double(timer) / TICRATE));
@@ -216,7 +235,7 @@ class Invasion : EventHandler
 	
 	clearscope int SpawnThreshold() const
 	{
-		return waitEnemies;
+		return lastSpawnThreshold;
 	}
 	
 	clearscope int CurrentWave() const
@@ -241,17 +260,12 @@ class Invasion : EventHandler
 	
 	clearscope bool WaveEnded() const
 	{
-		return bWaveEnded;
+		return bWaveFinished;
 	}
 	
 	clearscope bool Started() const
 	{
 		return bStarted;
-	}
-	
-	clearscope bool Ended() const
-	{
-		return modeState == GS_END;
 	}
 	
 	clearscope bool Paused() const
@@ -265,6 +279,7 @@ class Invasion : EventHandler
 			return;
 		
 		bStarted = true;
+		modeState = GS_COUNTDOWN;
 		wave = 1;
 		length = l;
 		timer = waveTimer = t;
@@ -277,7 +292,8 @@ class Invasion : EventHandler
 		
 		wave = length;
 		timer = 0;
-		modeState = GS_END;
+		modeState = GS_ENDED;
+		ClearMonsters();
 	}
 	
 	void Pause(bool val)
@@ -290,7 +306,7 @@ class Invasion : EventHandler
 		if (!bStarted)
 			return;
 		
-		if (modeState == GS_IDLE || modeState == GS_COUNTDOWN)
+		if (modeState == GS_COUNTDOWN)
 		{
 			timer = 0;
 			modeState = GS_ACTIVE;
@@ -306,15 +322,16 @@ class Invasion : EventHandler
 		
 		if (modeState == GS_ACTIVE)
 		{
-			timer = 0;
 			if (wave >= length)
-				modeState = GS_END;
+			{
+				timer = 0;
+				wave = length;
+				modeState = GS_ENDED;
+			}
 			else
 			{
-				modeState = GS_IDLE;
-				bWaveEnded = true;
-				timer = waveTimer;
-				++wave;
+				modeState = GS_VICTORY;
+				timer = VICTORY_TIME;
 			}
 			
 			ClearMonsters();
@@ -388,15 +405,6 @@ class Invasion : EventHandler
 			return false;
 		
 		return inv.Started();
-	}
-	
-	clearscope static bool GetGameEnded()
-	{
-		let inv = Invasion.GetMode();
-		if (!inv)
-			return false;
-		
-		return inv.Ended();
 	}
 	
 	clearscope static bool GetGamePaused()

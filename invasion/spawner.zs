@@ -13,15 +13,17 @@ enum EFlags
 	FL_RESET = 1,
 	FL_ALWAYS = 1<<1,
 	FL_SEQUENCE = 1<<2,
-	FL_WAIT = 1<<3,
-	FL_DELAY = 1<<4,
-	FL_HALF = 1<<5,
-	FL_DOUBLE = 1<<6,
-	FL_QUADRUPLE = 1<<7,
-	FL_SILENT = 1<<8,
-	FL_WAVE = 1<<9,
-	FL_DIFFICULTY = 1<<10,
-	FL_PLAYER = 1<<11
+	FL_WAITMONST = 1<<3,
+	FL_WAITFIRST = 1<<4,
+	FL_DELAY = 1<<5,
+	FL_HALF = 1<<6,
+	FL_DOUBLE = 1<<7,
+	FL_QUADRUPLE = 1<<8,
+	FL_NOFOG = 1<<9,
+	FL_SILENT = 1<<10,
+	FL_WAVE = 1<<11,
+	FL_DIFFICULTY = 1<<12,
+	FL_PLAYER = 1<<13
 }
 
 class InvasionSpawner : Actor abstract
@@ -30,6 +32,7 @@ class InvasionSpawner : Actor abstract
 	private int timer;
 	private int spawnLimit;
 	private bool bPaused;
+	private bool bSpawned;
 	
 	Default
 	{
@@ -43,7 +46,7 @@ class InvasionSpawner : Actor abstract
 		//$Arg2Tooltip The delay in tics (35 per second) between spawns
 		//$Arg3 Spawn Limit
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Use inital spawn delay"; 32 = "Halve intial spawn delay"; 64 = "Double initial spawn delay"; 128 = "Quadruple initial spawn delay"; 256 = "No teleport fog"; 512 = "Scale with wave"; 1024 = "Scale with difficulty"; 2048 = "Scale with players"; }
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Wait for first active wave"; 32 = "Use inital spawn delay"; 64 = "Halve intial spawn delay"; 128 = "Double initial spawn delay"; 256 = "Quadruple initial spawn delay"; 512 = "No teleport fog"; 1024 = "Silent initial spawn"; 2048 = "Scale with wave"; 4096 = "Scale with difficulty"; 8192 = "Scale with players"; }
 		//$Arg4Type 12
 		
 		FloatBobPhase 0;
@@ -116,8 +119,8 @@ class InvasionSpawner : Actor abstract
 		
 		if (bDestroyed || bDormant || bPaused
 			|| !InWaveRange(mode.CurrentWave())
-			|| (mode.GameState() != GS_ACTIVE && !(args[FLAGS] & FL_ALWAYS))
-			|| ((args[FLAGS] & FL_WAIT) && mode.RemainingEnemies() > mode.SpawnThreshold())
+			|| (mode.GameState() != GS_ACTIVE && (!(args[FLAGS] & FL_ALWAYS) || ((args[FLAGS] & FL_WAITFIRST) && !bSpawned)))
+			|| ((args[FLAGS] & FL_WAITMONST) && mode.RemainingEnemies() > mode.SpawnThreshold())
 			|| IsFrozen())
 		{
 			return;
@@ -165,13 +168,15 @@ class InvasionSpawner : Actor abstract
 		
 		bool spawned;
 		Actor mo;
+		mode.CountMonster(true);
 		[spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG, tid: args[ACTOR_TID]);
+		mode.CountMonster(false);
 		if (spawned)
 		{
 			if (mo)
 			{
 				mo.bNeverRespawn = true;
-				if (!(args[FLAGS] & FL_SILENT))
+				if ((!(args[FLAGS] & FL_SILENT) || bSpawned) && !(args[FLAGS] & FL_NOFOG))
 				{
 					let tf = Spawn("TeleportFog", mo.pos);
 					if (tf)
@@ -192,6 +197,7 @@ class InvasionSpawner : Actor abstract
 				ACS_ExecuteAlways(args[SCRIPT]);
 			
 			timer = args[SPAWN_DELAY];
+			bSpawned = true;
 		}
 		else
 			timer = TICRATE; // keep retrying every second

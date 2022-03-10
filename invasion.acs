@@ -2,9 +2,11 @@
 #include "zcommon.acs"
 
 #libdefine INVALID_STATE -1
-#libdefine WAVE_IDLE 0
-#libdefine WAVE_COUNTDOWN 1
-#libdefine WAVE_STARTED 2
+#libdefine GAME_WAITING 0
+#libdefine GAME_ENDED 1
+#libdefine WAVE_COUNTDOWN 2
+#libdefine WAVE_STARTED 3
+#libdefine WAVE_VICTORY 4
 
 function void StartInvasion(int gameLength, int waveDelay)
 {
@@ -33,7 +35,7 @@ function bool InvasionStarted(void)
 
 function bool InvasionEnded(void)
 {
-	return ScriptCall("Invasion", "GetGameEnded");
+	return ScriptCall("Invasion", "GetGameState") == GAME_ENDED;
 }
 
 function int GameLength(void)
