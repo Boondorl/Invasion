@@ -23,7 +23,8 @@ enum EFlags
 	FL_SILENT = 1<<10,
 	FL_WAVE = 1<<11,
 	FL_DIFFICULTY = 1<<12,
-	FL_PLAYER = 1<<13
+	FL_PLAYER = 1<<13,
+	FL_SETCALLER = 1<<14
 }
 
 class InvasionSpawner : Actor abstract
@@ -46,7 +47,7 @@ class InvasionSpawner : Actor abstract
 		//$Arg2Tooltip The delay in tics (35 per second) between spawns
 		//$Arg3 Spawn Limit
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Wait for first active wave"; 32 = "Use inital spawn delay"; 64 = "Halve intial spawn delay"; 128 = "Double initial spawn delay"; 256 = "Quadruple initial spawn delay"; 512 = "No teleport fog"; 1024 = "Silent initial spawn"; 2048 = "Scale with wave"; 4096 = "Scale with difficulty"; 8192 = "Scale with players"; }
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Wait for first active wave"; 32 = "Use inital spawn delay"; 64 = "Halve intial spawn delay"; 128 = "Double initial spawn delay"; 256 = "Quadruple initial spawn delay"; 512 = "No teleport fog"; 1024 = "Silent initial spawn"; 2048 = "Scale with wave"; 4096 = "Scale with difficulty"; 8192 = "Scale with players"; 16384 = "Set spawned as script caller"; }
 		//$Arg4Type 12
 		
 		FloatBobPhase 0;
@@ -195,7 +196,12 @@ class InvasionSpawner : Actor abstract
 			if (args[FLAGS] & FL_SEQUENCE)
 				target = mo;
 			if (args[SCRIPT])
-				ACS_ExecuteAlways(args[SCRIPT]);
+			{
+				if (args[FLAGS] & FL_SETCALLER)
+					level.ExecuteSpecial(226, mo, null, false, args[SCRIPT]);
+				else
+					level.ExecuteSpecial(226, self, null, false, args[SCRIPT]);
+			}
 			
 			timer = args[SPAWN_DELAY];
 			bSpawned = true;

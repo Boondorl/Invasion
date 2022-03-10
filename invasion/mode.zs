@@ -207,7 +207,7 @@ class Invasion : EventHandler
 	
 	override void WorldThingSpawned(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster)
+		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE)
 			return;
 		
 		string key = String.Format("%p", e.thing);
@@ -222,7 +222,7 @@ class Invasion : EventHandler
 	
 	override void WorldThingRevived(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster)
+		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE)
 			return;
 		
 		++enemies;
@@ -230,7 +230,7 @@ class Invasion : EventHandler
 	
 	override void WorldThingDied(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster)
+		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE)
 			return;
 		
 		--enemies;
@@ -238,7 +238,7 @@ class Invasion : EventHandler
 	
 	override void WorldThingDestroyed(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || e.thing.health <= 0)
+		if (!e.thing || !e.thing.bIsMonster || e.thing.health <= 0 || modeState != GS_ACTIVE)
 			return;
 		
 		--enemies;
@@ -255,7 +255,7 @@ class Invasion : EventHandler
 		int x, y;
 		if (modeState != GS_ENDED)
 		{
-			string waveCount = String.Format("Wave %d of %d", wave, length);
+			string waveCount = length > 0 ? String.Format("Wave %d of %d", wave, length) : String.Format("Wave %d", wave);
 			x = w - bigfont.StringWidth(waveCount)*scale.x/2;
 			Screen.DrawText(bigfont, -1, x, y, waveCount, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
 			y += height;
@@ -394,7 +394,7 @@ class Invasion : EventHandler
 		
 		if (modeState == GS_ACTIVE)
 		{
-			if (wave >= length)
+			if (length > 0 && wave >= length)
 			{
 				timer = 0;
 				wave = length;
