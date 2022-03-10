@@ -5,7 +5,7 @@
 #libdefine GAME_WAITING 0
 #libdefine GAME_ENDED 1
 #libdefine WAVE_COUNTDOWN 2
-#libdefine WAVE_STARTED 3
+#libdefine WAVE_ACTIVE 3
 #libdefine WAVE_VICTORY 4
 
 function void StartInvasion(int gameLength, int waveDelay)

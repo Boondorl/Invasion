@@ -168,14 +168,15 @@ class InvasionSpawner : Actor abstract
 		
 		bool spawned;
 		Actor mo;
-		mode.CountMonster(true);
 		[spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG, tid: args[ACTOR_TID]);
-		mode.CountMonster(false);
 		if (spawned)
 		{
 			if (mo)
 			{
 				mo.bNeverRespawn = true;
+				if (mo.bIsMonster)
+					mode.AddIgnore(mo);
+				
 				if ((!(args[FLAGS] & FL_SILENT) || bSpawned) && !(args[FLAGS] & FL_NOFOG))
 				{
 					let tf = Spawn("TeleportFog", mo.pos);
@@ -281,6 +282,11 @@ class InvasionSpawner : Actor abstract
 	clearscope bool Paused() const
 	{
 		return bPaused;
+	}
+	
+	void ClearSpawns()
+	{
+		spawnLimit = 0;
 	}
 	
 	void Pause(bool val)

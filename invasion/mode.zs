@@ -17,7 +17,6 @@ class Invasion : EventHandler
 	private bool bPaused;
 	private bool bWaveStarted;
 	private bool bWaveFinished;
-	private bool bCountSpawn;
 	private int length;
 	private int waveTimer;
 	private int modeState;
@@ -26,6 +25,25 @@ class Invasion : EventHandler
 	private int lastSpawnThreshold;
 	private int wave;
 	private int timer;
+	
+	private Dictionary ignore;
+	
+	override void OnRegister()
+	{
+		ignore = Dictionary.Create();
+	}
+	
+	override void WorldLoaded(WorldEvent e)
+	{
+		if (modeState != GS_WAITING)
+		{
+			bStarted = bPaused = bWaveStarted = bWaveFinished = false;
+			length = wave = waveTimer = timer = 0;
+			modeState = GS_WAITING;
+			ClearMonsters();
+			RemoveCorpses();
+		}
+	}
 	
 	override void WorldTick()
 	{
@@ -58,6 +76,7 @@ class Invasion : EventHandler
 			bWaveFinished = true;
 			++wave;
 			modeState = GS_COUNTDOWN;
+			RemoveCorpses();
 		}
 	}
 	
@@ -132,18 +151,71 @@ class Invasion : EventHandler
 			}
 		}
 		
+		it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
+		InvasionSpawner s;
+		while (s = InvasionSpawner(it.Next()))
+		{
+			bool dontWipe = true;
+			if (!s.bDormant && s.InWaveRange(wave))
+			{
+				dontWipe = false;
+				let di = s.GetDropItems();
+				while (di)
+				{
+					// if it has any chance to spawn non-monsters it shouldn't be counted
+					if (di.Name != 'None')
+					{
+						class<Actor> type = di.Name;
+						if (type)
+						{
+							let def = GetDefaultByType(Actor.GetReplacement(type));
+							if (!def.bIsMonster || def.bFriendly)
+							{
+								dontWipe = true;
+								break;
+							}
+						}
+					}
+					
+					di = di.Next;
+				}
+			}
+			
+			if (!dontWipe)
+				s.ClearSpawns();
+		}
+		
 		enemies = lastSpawnThreshold = 0;
 	}
 	
-	void CountMonster(bool val)
+	void RemoveCorpses()
 	{
-		bCountSpawn = val;
+		let it = ThinkerIterator.Create("Actor", Thinker.STAT_DEFAULT);
+		Actor mo;
+		while (mo = Actor(it.Next()))
+		{
+			if (mo.bIsMonster && mo.health <= 0)
+				mo.Destroy();
+		}
+	}
+	
+	void AddIgnore(Actor mo)
+	{
+		if (mo)
+			ignore.Insert(String.Format("%p", mo), "1");
 	}
 	
 	override void WorldThingSpawned(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || !bCountSpawn)
+		if (!e.thing || !e.thing.bIsMonster)
 			return;
+		
+		string key = String.Format("%p", e.thing);
+		if (ignore.At(key) != "")
+		{
+			ignore.Remove(key);
+			return;
+		}
 		
 		++enemies;
 	}
