@@ -132,12 +132,47 @@ class Invasion : EventHandler
 			}
 			
 			counter += add;
-			if (!(inv.args[FLAGS] & FL_WAITMONST))
+			if (inv.args[FLAGS] & FL_WAITMONST)
 				thresholdCounter += add;
 		}
 		
 		enemies = counter;
-		lastSpawnThreshold = max(0, counter - thresholdCounter);
+		lastSpawnThreshold = thresholdCounter;
+	}
+	
+	void ModifyMonsterCount(InvasionSpawner s)
+	{
+		if (modeState != GS_ACTIVE || !s || !s.InWaveRange(wave))
+			return;
+		
+		int add = s.RemainingSpawns();
+		let di = s.GetDropItems();
+		while (di)
+		{
+			// if it has any chance to spawn non-monsters it shouldn't be counted
+			if (di.Name != 'None')
+			{
+				class<Actor> type = di.Name;
+				if (type)
+				{
+					let def = GetDefaultByType(type);
+					if (!def.bIsMonster)
+					{
+						add = 0;
+						break;
+					}
+				}
+			}
+			
+			di = di.Next;
+		}
+		
+		if (s.bDormant)
+			add *= -1;
+		
+		enemies = max(0, enemies + add);
+		if (s.args[FLAGS] & FL_WAITMONST)
+			lastSpawnThreshold = max(0, lastSpawnThreshold + add);
 	}
 	
 	void ClearMonsters()
@@ -411,6 +446,7 @@ class Invasion : EventHandler
 			}
 			
 			ClearMonsters();
+			skipCounter = 0;
 		}
 	}
 	

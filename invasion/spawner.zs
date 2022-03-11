@@ -72,19 +72,31 @@ class InvasionSpawner : Actor abstract
 	{
 		super.PostBeginPlay();
 		
-		timer = GetSpawnDelay();
-		spawnLimit = GetSpawnAmount(1);
 		mode = Invasion.GetMode();
+		timer = GetSpawnDelay();
+		spawnLimit = GetSpawnAmount(mode.CurrentWave());
+		if (!bDormant && mode.GameState() == GS_ACTIVE)
+			mode.ModifyMonsterCount(self);
 	}
 	
 	override void Activate(Actor activator)
 	{
+		if (!bDormant)
+			return;
+		
 		bDormant = false;
+		if (mode)
+			mode.ModifyMonsterCount(self);
 	}
 	
 	override void Deactivate(Actor deactivator)
 	{
+		if (bDormant)
+			return;
+		
 		bDormant = true;
+		if (mode)
+			mode.ModifyMonsterCount(self);
 	}
 	
 	override void Tick()
