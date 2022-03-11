@@ -108,7 +108,7 @@ class InvasionSpawner : Actor abstract
 		
 		if ((args[FLAGS] & FL_SEQUENCE) && target)
 		{
-			if (target.bIsMonster && (target.bFriendly || target.health <= 0))
+			if (target.bIsMonster && target.health <= 0)
 				target = null;
 			else
 			{
@@ -167,6 +167,11 @@ class InvasionSpawner : Actor abstract
 				type = "Unknown";
 		}
 		
+		bool skip;
+		let def = GetDefaultByType(type);
+		if (def.bIsMonster)
+			skip = true;
+		
 		bool spawned;
 		Actor mo;
 		[spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG, tid: args[ACTOR_TID]);
@@ -175,8 +180,8 @@ class InvasionSpawner : Actor abstract
 			if (mo)
 			{
 				mo.bNeverRespawn = true;
-				if (mo.bIsMonster)
-					mode.AddIgnore(mo);
+				if (skip)
+					mode.DisableCounter();
 				
 				if ((!(args[FLAGS] & FL_SILENT) || bSpawned) && !(args[FLAGS] & FL_NOFOG))
 				{

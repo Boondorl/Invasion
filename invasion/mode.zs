@@ -17,6 +17,8 @@ class Invasion : EventHandler
 	private bool bPaused;
 	private bool bWaveStarted;
 	private bool bWaveFinished;
+	private bool bEndOfWaveCheck;
+	private int skipCounter;
 	private int length;
 	private int waveTimer;
 	private int modeState;
@@ -26,19 +28,12 @@ class Invasion : EventHandler
 	private int wave;
 	private int timer;
 	
-	private Dictionary ignore;
-	
-	override void OnRegister()
-	{
-		ignore = Dictionary.Create();
-	}
-	
 	override void WorldLoaded(WorldEvent e)
 	{
 		if (modeState != GS_WAITING)
 		{
-			bStarted = bPaused = bWaveStarted = bWaveFinished = false;
-			length = wave = waveTimer = timer = 0;
+			bStarted = bPaused = bWaveStarted = bWaveFinished = bEndOfWaveCheck = false;
+			length = wave = waveTimer = timer = skipCounter = 0;
 			modeState = GS_WAITING;
 			ClearMonsters();
 			RemoveCorpses();
@@ -91,7 +86,16 @@ class Invasion : EventHandler
 	{
 		timer = 0;
 		if (enemies <= 0)
-			WaveEnd();
+		{
+			// add a one tick delay in case of random spawners
+			if (bEndOfWaveCheck)
+				WaveEnd();
+			else
+				bEndOfWaveCheck = true;
+		}
+		else
+			bEndOfWaveCheck = false;
+			
 	}
 	
 	void UpdateMonsterCount()
@@ -114,8 +118,8 @@ class Invasion : EventHandler
 						class<Actor> type = di.Name;
 						if (type)
 						{
-							let def = GetDefaultByType(Actor.GetReplacement(type));
-							if (!def.bIsMonster || def.bFriendly)
+							let def = GetDefaultByType(type);
+							if (!def.bIsMonster)
 							{
 								add = 0;
 								break;
@@ -142,7 +146,7 @@ class Invasion : EventHandler
 		Actor mo;
 		while (mo = Actor(it.Next()))
 		{
-			if (mo.bIsMonster && !mo.bFriendly && mo.health > 0)
+			if (mo.bIsMonster && mo.health > 0)
 			{
 				mo.damageTypeReceived = 'None';
 				mo.special1 = mo.health;
@@ -168,8 +172,8 @@ class Invasion : EventHandler
 						class<Actor> type = di.Name;
 						if (type)
 						{
-							let def = GetDefaultByType(Actor.GetReplacement(type));
-							if (!def.bIsMonster || def.bFriendly)
+							let def = GetDefaultByType(type);
+							if (!def.bIsMonster)
 							{
 								dontWipe = true;
 								break;
@@ -199,10 +203,9 @@ class Invasion : EventHandler
 		}
 	}
 	
-	void AddIgnore(Actor mo)
+	void DisableCounter()
 	{
-		if (mo)
-			ignore.Insert(String.Format("%p", mo), "1");
+		++skipCounter;
 	}
 	
 	override void WorldThingSpawned(WorldEvent e)
@@ -210,10 +213,9 @@ class Invasion : EventHandler
 		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE)
 			return;
 		
-		string key = String.Format("%p", e.thing);
-		if (ignore.At(key) != "")
+		if (skipCounter > 0)
 		{
-			ignore.Remove(key);
+			--skipCounter;
 			return;
 		}
 		
@@ -394,6 +396,8 @@ class Invasion : EventHandler
 		
 		if (modeState == GS_ACTIVE)
 		{
+			bEndOfWaveCheck = false;
+			
 			if (length > 0 && wave >= length)
 			{
 				timer = 0;
