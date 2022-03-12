@@ -74,7 +74,7 @@ class InvasionSpawner : Actor abstract
 		
 		mode = Invasion.GetMode();
 		timer = GetSpawnDelay();
-		spawnLimit = GetSpawnAmount(mode.CurrentWave());
+		spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
 		if (!bDormant && mode.GameState() == GS_ACTIVE)
 			mode.ModifyMonsterCount(self);
 	}
@@ -239,7 +239,7 @@ class InvasionSpawner : Actor abstract
 		if (args[FLAGS] & FL_WAVE)
 		{
 			int multi = max(0, health > 0 ? wave-health : wave-1);
-			s += args[SPAWN_LIMIT]*0.2*multi;
+			s += ceil(args[SPAWN_LIMIT]*0.2*multi);
 		}
 		
 		if (args[FLAGS] & FL_DIFFICULTY)
@@ -254,7 +254,7 @@ class InvasionSpawner : Actor abstract
 			else
 			{
 				multi = max(0, skill - 3);
-				s += args[SPAWN_LIMIT]*0.25*multi;
+				s += ceil(args[SPAWN_LIMIT]*0.25*multi);
 			}
 		}
 		
@@ -270,7 +270,7 @@ class InvasionSpawner : Actor abstract
 			}
 			
 			int multi = max(0, count-1);
-			s += args[SPAWN_LIMIT]*0.3*multi;
+			s += ceil(args[SPAWN_LIMIT]*0.3*multi);
 		}
 		
 		return s;

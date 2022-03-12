@@ -304,14 +304,24 @@ class Invasion : EventHandler
 			switch (modeState)
 			{
 				case GS_COUNTDOWN:
-					if (timer <= COUNTDOWN_TIME)
+					if (bWaveFinished)
+						text = "Wave defeated!";
+					else if (timer <= COUNTDOWN_TIME)
 						text = "Prepare for battle!";
 					else
 						text = String.Format("Next wave in %d seconds", ceil(double(timer) / TICRATE));
 					break;
 					
 				case GS_ACTIVE:
-					text = String.Format("%d enemies remaining", enemies);
+					if (enemies == 1)
+						text = String.Format("%d enemy remaining", enemies);
+					else if (!enemies)
+					{
+						if (length <= 0 || wave < length)
+							text = "Wave defeated!";
+					}
+					else
+						text = String.Format("%d enemies remaining", enemies);
 					break;
 					
 				case GS_VICTORY:
@@ -326,7 +336,7 @@ class Invasion : EventHandler
 			x = w - bigfont.StringWidth(text)*scale.x/2;
 			Screen.DrawText(bigfont, -1, x, y, text, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
 			
-			if (modeState == GS_COUNTDOWN && timer <= COUNTDOWN_TIME)
+			if (modeState == GS_COUNTDOWN && timer <= COUNTDOWN_TIME && !bWaveFinished)
 			{
 				y += height;
 				string counter = String.Format("%d", ceil(double(timer) / TICRATE));
