@@ -3,6 +3,7 @@ version "4.7"
 // base
 #include "invasion/mode.zs"
 #include "invasion/spawner.zs"
+#include "invasion/map.zs"
 
 // Doom wrappers
 #include "invasion/spawners/monsterspawner.zs"
