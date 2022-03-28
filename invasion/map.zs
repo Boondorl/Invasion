@@ -65,7 +65,7 @@ class MonsterPusher : Actor
 		Actor cur = sec.thinglist;
 		while (cur)
 		{
-			if (cur.bIsMonster)
+			if (cur.bIsMonster && !cur.bDormant && !cur.IsFrozen())
 			{
 				double diff = cur.vel.xy dot dir;
 				if (diff < power)

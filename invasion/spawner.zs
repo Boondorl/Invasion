@@ -24,7 +24,8 @@ enum EFlags
 	FL_WAVE = 1<<11,
 	FL_DIFFICULTY = 1<<12,
 	FL_PLAYER = 1<<13,
-	FL_SETCALLER = 1<<14
+	FL_SETCALLER = 1<<14,
+	FL_NOTARGET = 1<<15
 }
 
 class InvasionSpawner : Actor abstract
@@ -34,6 +35,7 @@ class InvasionSpawner : Actor abstract
 	private int spawnLimit;
 	private bool bPaused;
 	private bool bSpawned;
+	private PlayerInfo alerter;
 	
 	Default
 	{
@@ -47,7 +49,7 @@ class InvasionSpawner : Actor abstract
 		//$Arg2Tooltip The delay in tics (35 per second) between spawns
 		//$Arg3 Spawn Limit
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Wait for first active wave"; 32 = "Use inital spawn delay"; 64 = "Halve intial spawn delay"; 128 = "Double initial spawn delay"; 256 = "Quadruple initial spawn delay"; 512 = "No teleport fog"; 1024 = "Silent initial spawn"; 2048 = "Scale with wave"; 4096 = "Scale with difficulty"; 8192 = "Scale with players"; 16384 = "Set spawned as script caller"; }
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Wait for first active wave"; 32 = "Use inital spawn delay"; 64 = "Halve intial spawn delay"; 128 = "Double initial spawn delay"; 256 = "Quadruple initial spawn delay"; 512 = "No teleport fog"; 1024 = "Silent initial spawn"; 2048 = "Scale with wave"; 4096 = "Scale with difficulty"; 8192 = "Scale with players"; 16384 = "Set spawned as script caller"; 32768 = "Don't set monster target on spawn"; }
 		//$Arg4Type 12
 		
 		FloatBobPhase 0;
@@ -112,10 +114,17 @@ class InvasionSpawner : Actor abstract
 		
 		if (mode.WaveEnded())
 		{
+			alerter = null;
 			if (!(args[FLAGS] & FL_ALWAYS))
 				timer = GetSpawnDelay();
 			if (args[flags] & FL_RESET)
 				spawnLimit = GetSpawnAmount(mode.CurrentWave());
+		}
+		
+		if (alerter)
+		{
+			SoundAlert(alerter.mo);
+			alerter = null;
 		}
 		
 		if ((args[FLAGS] & FL_SEQUENCE) && target)
@@ -179,21 +188,43 @@ class InvasionSpawner : Actor abstract
 				type = "Unknown";
 		}
 		
-		bool skip;
 		let def = GetDefaultByType(type);
-		if (def.bIsMonster)
-			skip = true;
+		bool success = true;
+		if (def.bSolid)
+		{
+			bool curSolid = bSolid;
+			
+			bSolid = def.bSolid;
+			height = def.height;
+			if (radius != def.radius)
+				A_SetSize(def.radius);
+			
+			success = TestMobjLocation();
+			bSolid = curSolid;
+		}
 		
+		if (!success)
+			return;
+		
+		bool monst = def.bIsMonster;
 		bool spawned;
 		Actor mo;
-		[spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG, tid: args[ACTOR_TID]);
+		[spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: args[ACTOR_TID]);
 		if (spawned)
 		{
 			if (mo)
 			{
 				mo.bNeverRespawn = true;
-				if (skip)
+				if (monst)
+				{
 					mode.DisableCounter();
+					if (!(args[FLAGS] & FL_NOTARGET))
+					{
+						Actor nearest = GetNearestPlayer();
+						if (nearest)
+							alerter = nearest.player;
+					}
+				}
 				
 				if ((!(args[FLAGS] & FL_SILENT) || bSpawned) && !(args[FLAGS] & FL_NOFOG))
 				{
@@ -226,6 +257,51 @@ class InvasionSpawner : Actor abstract
 		else
 			timer = TICRATE; // keep retrying every second
 		
+	}
+	
+	private Actor GetNearestPlayer()
+	{
+		if (!multiplayer)
+			return players[0].mo;
+		
+		Actor validPlayer;
+		uint closestIndex = MAXPLAYERS;
+		double closestDist, closestValid;
+		closestDist = closestValid = double.max;
+		
+		for (uint i = 0; i < MAXPLAYERS; ++i)
+		{
+			if (!playerInGame[i])
+				continue;
+			
+			double d = Distance3DSquared(players[i].mo);
+			if (d < closestDist)
+			{
+				closestIndex = i;
+				closestDist = d;
+			}
+			
+			if (d < closestValid && CheckSight(players[i].mo, SF_IGNOREWATERBOUNDARY))
+			{
+				validPlayer = players[i].mo;
+				closestValid = d;
+			}
+		}
+		
+		if (!validPlayer)
+		{
+			if (curSector.soundTarget && curSector.soundTarget.player)
+				validPlayer = curSector.soundTarget;
+			else
+			{
+				if (closestIndex < MAXPLAYERS)
+					validPlayer = players[closestIndex].mo;
+				else
+					validPlayer = players[0].mo;
+			}
+		}
+		
+		return validPlayer;
 	}
 	
 	clearscope int GetSpawnAmount(int wave) const
