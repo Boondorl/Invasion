@@ -95,7 +95,6 @@ class Invasion : EventHandler
 		}
 		else
 			bEndOfWaveCheck = false;
-			
 	}
 	
 	void UpdateMonsterCount()
@@ -344,6 +343,24 @@ class Invasion : EventHandler
 				Screen.DrawText(bigfont, -1, x, y, counter, DTA_ScaleX, scale.x*2, DTA_ScaleY, scale.y*2);
 			}
 		}
+	}
+
+	override void PlayerRespawned(PlayerEvent e)
+	{
+		let it = ThinkerIterator.Create("FuturePlayerStart", STAT_FUTURE_PLAYER_START);
+		FuturePlayerStart spot;
+		FuturePlayerStart current;
+		while (spot = FuturePlayerStart(it.Next()))
+		{
+			if (spot.args[0]-1 != e.PlayerNumber || spot.args[1] > wave)
+				continue;
+			
+			if (!current || current.args[1] < spot.args[1])
+				current = spot;
+		}
+
+		if (current)
+			players[e.PlayerNumber].mo.Teleport(current.pos, current.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
 	}
 	
 	// Getters

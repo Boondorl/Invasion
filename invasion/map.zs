@@ -18,6 +18,7 @@ class MonsterPusher : Actor
 		//$Arg1Default 8
 		//$Arg2 Angle
 		//$Arg2Type 8
+
 		FloatBobPhase 0;
 		Radius 0;
 		Height 0;
@@ -27,6 +28,13 @@ class MonsterPusher : Actor
 		+NOSECTOR
 		+NOTONAUTOMAP
 		+DONTBLAST
+	}
+
+	override void BeginPlay()
+	{
+		super.BeginPlay();
+
+		ChangeStatNum(STAT_FIRST_THINKING);
 	}
 	
 	override void Activate(Actor activator)
@@ -74,5 +82,48 @@ class MonsterPusher : Actor
 			
 			cur = cur.snext;
 		}
+	}
+}
+
+const STAT_FUTURE_PLAYER_START = Thinker.STAT_STATIC + 1;
+
+class FuturePlayerStart : Actor
+{
+	Default
+	{
+		//$Category Invasion
+		//$Title Future Player Start
+		//$Sprite PLAYA1
+		//$Color 2
+		//$Arg0 Player Start Number
+		//$Arg0Default 1
+		//$Arg1 Wave
+		//$Arg1ToolTip The wave signifying when the matching player number will start spawning here.
+		//$Arg1Default 1
+
+		FloatBobPhase 0;
+		Radius 0;
+		Height 0;
+		
+		+SYNCHRONIZED
+		+NOBLOCKMAP
+		+NOSECTOR
+		+NOTONAUTOMAP
+		+DONTBLAST
+	}
+
+	override void BeginPlay()
+	{
+		super.BeginPlay();
+
+		ChangeStatNum(STAT_FUTURE_PLAYER_START);
+	}
+
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+
+		if (args[1] <= 0)
+			Destroy();
 	}
 }

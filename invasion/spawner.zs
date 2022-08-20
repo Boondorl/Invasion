@@ -60,6 +60,7 @@ class InvasionSpawner : Actor abstract
 		+SYNCHRONIZED
 		+NOBLOCKMAP
 		+NOSECTOR
+		+NOTONAUTOMAP
 		+DONTBLAST
 	}
 	

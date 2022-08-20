@@ -5,6 +5,7 @@ GameInfo
 
 DoomEdNums
 {
+	23398 = FuturePlayerStart
 	23399 = MonsterPusher
 	23400 = PossessedSpawner
 	23401 = LightMonsterSpawner
@@ -68,4 +69,9 @@ DoomEdNums
 	23452 = ArmorBonusSpawner
 	23453 = GreenArmorSpawner
 	23454 = BlueArmorSpawner
+}
+
+map MAP01 "Deadly Doomguy"
+{
+	AllowRespawn
 }
