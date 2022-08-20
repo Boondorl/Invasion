@@ -70,8 +70,3 @@ DoomEdNums
 	23453 = GreenArmorSpawner
 	23454 = BlueArmorSpawner
 }
-
-map MAP01 "Deadly Doomguy"
-{
-	AllowRespawn
-}

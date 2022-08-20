@@ -348,10 +348,12 @@ class Invasion : EventHandler
 	override void PlayerRespawned(PlayerEvent e)
 	{
 		let it = ThinkerIterator.Create("FuturePlayerStart", STAT_FUTURE_PLAYER_START);
-		FuturePlayerStart spot;
-		FuturePlayerStart current;
+		FuturePlayerStart spot, def, current;
 		while (spot = FuturePlayerStart(it.Next()))
 		{
+			if (spot.args[0] == 1 && spot.args[1] <= wave && (!def || def.args[1] < spot.args[1]))
+				def = spot;
+
 			if (spot.args[0]-1 != e.PlayerNumber || spot.args[1] > wave)
 				continue;
 			
@@ -359,6 +361,8 @@ class Invasion : EventHandler
 				current = spot;
 		}
 
+		if (!current)
+			current = def;
 		if (current)
 			players[e.PlayerNumber].mo.Teleport(current.pos, current.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
 	}

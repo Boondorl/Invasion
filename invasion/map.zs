@@ -49,7 +49,7 @@ class MonsterPusher : Actor
 	
 	override void Tick()
 	{
-		if (bDormant || !args[PUSH_POW])
+		if (bDormant || !args[PUSH_POW] || IsFrozen())
 			return;
 		
 		Vector2 dir = AngleToVector(args[PUSH_ANG]);
