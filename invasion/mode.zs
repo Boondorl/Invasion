@@ -8,8 +8,8 @@ enum EModeStates
 	GS_VICTORY
 }
 
-const COUNTDOWN_TIME = Thinker.TICRATE * 5;
-const VICTORY_TIME = Thinker.TICRATE * 3;
+const COUNTDOWN_TIME = Object.TICRATE * 5;
+const VICTORY_TIME = Object.TICRATE * 3;
 
 class Invasion : EventHandler
 {
@@ -291,7 +291,7 @@ class Invasion : EventHandler
 		int x, y;
 		if (modeState != GS_ENDED)
 		{
-			string waveCount = length > 0 ? String.Format("Wave %d of %d", wave, length) : String.Format("Wave %d", wave);
+			string waveCount = length > 0 ? String.Format(StringTable.Localize("$IN_WAVE"), wave, length) : String.Format(StringTable.Localize("$IN_ENDLESS"), wave);
 			x = w - bigfont.StringWidth(waveCount)*scale.x/2;
 			Screen.DrawText(bigfont, -1, x, y, waveCount, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
 			y += height;
@@ -304,31 +304,31 @@ class Invasion : EventHandler
 			{
 				case GS_COUNTDOWN:
 					if (bWaveFinished)
-						text = "Wave defeated!";
+						text = StringTable.Localize("$IN_DEFEATED");
 					else if (timer <= COUNTDOWN_TIME)
-						text = "Prepare for battle!";
+						text = StringTable.Localize("$IN_PREPARE");
 					else
-						text = String.Format("Next wave in %d seconds", ceil(double(timer) / TICRATE));
+						text = String.Format(StringTable.Localize("$IN_COUNTDOWN"), ceil(double(timer) / TICRATE));
 					break;
 					
 				case GS_ACTIVE:
 					if (enemies == 1)
-						text = String.Format("%d enemy remaining", enemies);
+						text = String.Format(StringTable.Localize("$IN_ONE_REMAINING"), enemies);
 					else if (!enemies)
 					{
 						if (length <= 0 || wave < length)
-							text = "Wave defeated!";
+							text = StringTable.Localize("$IN_DEFEATED");
 					}
 					else
-						text = String.Format("%d enemies remaining", enemies);
+						text = String.Format(StringTable.Localize("$IN_REMAINING"), enemies);
 					break;
 					
 				case GS_VICTORY:
-					text = "Wave defeated!";
+					text = StringTable.Localize("$IN_DEFEATED");
 					break;
 					
 				case GS_ENDED:
-					text = "Invasion defeated!";
+					text = StringTable.Localize("$IN_VICTORY");
 					break;
 			}
 			
