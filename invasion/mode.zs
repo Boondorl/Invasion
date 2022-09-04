@@ -17,7 +17,6 @@ class Invasion : EventHandler
 	private bool bPaused;
 	private bool bWaveStarted;
 	private bool bWaveFinished;
-	private bool bEndOfWaveCheck;
 	private int skipCounter;
 	private int length;
 	private int waveTimer;
@@ -32,7 +31,7 @@ class Invasion : EventHandler
 	{
 		if (modeState != GS_WAITING)
 		{
-			bStarted = bPaused = bWaveStarted = bWaveFinished = bEndOfWaveCheck = false;
+			bStarted = bPaused = bWaveStarted = bWaveFinished = false;
 			length = wave = waveTimer = timer = skipCounter = 0;
 			modeState = GS_WAITING;
 			ClearMonsters();
@@ -86,15 +85,7 @@ class Invasion : EventHandler
 	{
 		timer = 0;
 		if (enemies <= 0)
-		{
-			// add a one tick delay in case of random spawners
-			if (bEndOfWaveCheck)
-				WaveEnd();
-			else
-				bEndOfWaveCheck = true;
-		}
-		else
-			bEndOfWaveCheck = false;
+			WaveEnd();
 	}
 	
 	void UpdateMonsterCount()
@@ -467,8 +458,6 @@ class Invasion : EventHandler
 		
 		if (modeState == GS_ACTIVE)
 		{
-			bEndOfWaveCheck = false;
-			
 			if (length > 0 && wave >= length)
 			{
 				timer = 0;

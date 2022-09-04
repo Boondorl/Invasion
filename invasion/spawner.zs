@@ -213,6 +213,26 @@ class InvasionSpawner : Actor abstract
 		[spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: args[ACTOR_TID]);
 		if (spawned)
 		{
+			// Handle these manually because they're too much of a hassle to handle otherwise
+			while (mo is "RandomSpawner")
+			{
+				let rs = RandomSpawner(mo);
+				if (rs.bounceCount >= RandomSpawner.MAX_RANDOMSPAWNERS_RECURSION)
+					rs.species = 'Unknown';
+
+				if (rs.species != 'None')
+				{
+					mo = Spawn(rs.species, rs.pos);
+					mo.angle = rs.angle;
+					if (mo is "RandomSpawner")
+						mo.bounceCount = ++rs.bounceCount;
+
+					rs.PostSpawn(mo);
+				}
+
+				rs.Destroy();
+			}
+
 			if (mo)
 			{
 				mo.bNeverRespawn = true;
