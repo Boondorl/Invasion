@@ -224,6 +224,8 @@ class InvasionSpawner : Actor abstract
 				{
 					mo = Spawn(rs.species, rs.pos);
 					mo.angle = rs.angle;
+					mo.bAmbush = rs.bAmbush;
+					mo.ChangeTID(rs.tid);
 					if (mo is "RandomSpawner")
 						mo.bounceCount = ++rs.bounceCount;
 
