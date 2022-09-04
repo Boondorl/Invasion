@@ -365,6 +365,11 @@ class Invasion : EventHandler
 			current = def;
 		if (current)
 			players[e.PlayerNumber].mo.Teleport(current.pos, current.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
+		else if (!multiplayer)
+		{
+			let mo = players[e.PlayerNumber].mo;
+			mo.Teleport(mo.pos, mo.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
+		}
 	}
 	
 	// Getters
