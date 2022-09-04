@@ -224,7 +224,7 @@ class Invasion : EventHandler
 		while (mo = Actor(it.Next()))
 		{
 			if (mo.bIsMonster && mo.health <= 0)
-				mo.Destroy();
+				level.ExecuteSpecial(226, mo, null, false, -int('ExecuteCallbackFunction'));
 		}
 	}
 	
@@ -594,5 +594,10 @@ class Invasion : EventHandler
 		InvasionSpawner spawner;
 		while (spawner = InvasionSpawner(it.Next()))
 			spawner.Pause(val);
+	}
+
+	static void SetCallback(Name s)
+	{
+		ACS_ExecuteAlways(-int('SetCallbackFunction'), 0, -int(s), 0, 0);
 	}
 }

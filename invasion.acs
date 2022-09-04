@@ -82,3 +82,31 @@ function void PauseSpawner(int tid, bool val)
 {
 	ScriptCall("Invasion", "PauseSpawners", tid, val);
 }
+
+function void SetCallback(int s)
+{
+	ACS_NamedExecuteAlways("SetCallbackFunction", 0, s, 0, 0);
+}
+
+function void SetCallbackNamed(str s)
+{
+	ScriptCall("Invasion", "SetCallback", s);
+}
+
+int callBack = 0;
+script "ExecuteCallbackFunction" (void)
+{
+	if (!callBack)
+	{
+		Thing_Remove(0);
+		terminate;
+	}
+	
+	if (ACS_ExecuteWithResult(callBack, 0, 0, 0, 0))
+		Thing_Remove(0);
+}
+
+script "SetCallbackFunction" (int s)
+{
+	callBack = s;
+}
