@@ -8,19 +8,29 @@
 #libdefine WAVE_ACTIVE 3
 #libdefine WAVE_VICTORY 4
 
-function void StartInvasion(int gameLength, int waveDelay)
+function void StartInvasion(int gameLength, int waveDelay, bool textVis, bool noDel)
 {
-	ScriptCall("Invasion", "StartGame", gameLength, waveDelay);
+	ScriptCall("Invasion", "StartGame", gameLength, waveDelay, textVis, noDel);
 }
 
-function void EndInvasion(void)
+function void EndInvasion(bool k)
 {
-	ScriptCall("Invasion", "EndGame");
+	ScriptCall("Invasion", "EndGame", k);
 }
 
 function void PauseInvasion(bool val)
 {
 	ScriptCall("Invasion", "PauseGame", val);
+}
+
+function void SetGameDisplay(bool vis)
+{
+	ScriptCall("Invasion", "TextVisible", vis);
+}
+
+function bool GameDisplayed(void)
+{
+	return ScriptCall("Invasion", "GetTextVisible");
 }
 
 function bool InvasionPaused(void)
@@ -35,12 +45,18 @@ function bool InvasionStarted(void)
 
 function bool InvasionEnded(void)
 {
-	return ScriptCall("Invasion", "GetGameState") == GAME_ENDED;
+	int st = WaveState();
+	return st == GAME_ENDED || st == GAME_WAITING;
 }
 
 function int GameLength(void)
 {
 	return ScriptCall("Invasion", "GetGameLength");
+}
+
+function int GetCountdown(void)
+{
+	return ScriptCall("Invasion", "GetCountdownTimer");
 }
 
 function int WaveState(void)

@@ -63,6 +63,12 @@ class InvasionSpawner : Actor abstract
 		+NOTONAUTOMAP
 		+DONTBLAST
 	}
+
+	void Reset()
+	{
+		timer = GetSpawnDelay();
+		spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
+	}
 	
 	override void BeginPlay()
 	{
@@ -76,8 +82,7 @@ class InvasionSpawner : Actor abstract
 		super.PostBeginPlay();
 		
 		mode = Invasion.GetMode();
-		timer = GetSpawnDelay();
-		spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
+		Reset();
 		if (!bDormant && mode.GameState() == GS_ACTIVE)
 			mode.ModifyMonsterCount(self);
 	}
