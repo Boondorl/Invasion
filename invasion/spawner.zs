@@ -64,6 +64,7 @@ class InvasionSpawner : Actor abstract
 	private int spawnLimit;
 	private bool bPaused;
 	private bool bSpawned; // Has spawned at least once
+	private bool bInThreshold;
 
 	//$UserDefaultValue 1
 	int user_StartWave;
@@ -75,6 +76,7 @@ class InvasionSpawner : Actor abstract
 	double user_DifficultyScale;
 	//$UserDefaultValue 0.3
 	double user_PlayerScale;
+	int user_PlayerThreshold;
 	
 	Default
 	{
@@ -167,6 +169,8 @@ class InvasionSpawner : Actor abstract
 				timer = GetSpawnDelay();
 			if (args[FLAGS] & FL_RESET)
 				spawnLimit = GetSpawnAmount(mode.CurrentWave());
+
+			CheckSpawnTreshold();
 		}
 		
 		if ((args[FLAGS] & FL_SEQUENCE) && target)
@@ -204,6 +208,19 @@ class InvasionSpawner : Actor abstract
 		probability = max(1, probability);
 		spawnTypes.Push(InvasionType.Create(type, probability));
 		weight += probability;
+	}
+
+	protected void CheckSpawnTreshold()
+	{
+		bInThreshold = user_PlayerThreshold <= 1;
+		if (!bInThreshold && multiplayer)
+		{
+			int count;
+			for (int i = 0; i < MAXPLAYERS; ++i)
+				count += playerInGame[i];
+
+			bInThreshold = count >= user_PlayerThreshold;
+		}
 	}
 	
 	protected void SpawnActor()
@@ -396,7 +413,8 @@ class InvasionSpawner : Actor abstract
 	
 	clearscope bool InWaveRange(int wave) const
 	{
-		return (user_StartWave <= 0 || wave >= user_StartWave)
+		return bInThreshold
+				&& (user_StartWave <= 0 || wave >= user_StartWave)
 				&& (user_EndWave <= 0 || wave < user_EndWave);
 	}
 	
@@ -419,6 +437,7 @@ class InvasionSpawner : Actor abstract
 	{
 		timer = GetSpawnDelay();
 		spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
+		CheckSpawnTreshold();
 	}
 	
 	void ClearSpawns()
