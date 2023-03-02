@@ -40,17 +40,17 @@ class InvasionSpawner : Actor abstract
 	{
 		FL_NONE = 0,
 		FL_RESET = 1,
-		FL_ALWAYS = 1<<1,
-		FL_SEQUENCE = 1<<2,
-		FL_WAIT_MONST = 1<<3,
-		FL_WAIT_FIRST = 1<<4,
-		FL_NO_FOG = 1<<5,
-		FL_SILENT = 1<<6,
+		FL_SEQUENCE = 1<<1,
+		FL_ALWAYS = 1<<2,
+		FL_WAIT_FIRST = 1<<3,
+		FL_WAIT_MONST = 1<<4,
+		FL_SILENT = 1<<5,
+		FL_NO_FOG = 1<<6,
 		FL_WAVE = 1<<7,
 		FL_DIFFICULTY = 1<<8,
 		FL_PLAYER = 1<<9,
-		FL_SET_CALLER = 1<<10,
-		FL_NO_TARGET = 1<<11
+		FL_NO_TARGET = 1<<10,
+		FL_SET_CALLER = 1<<11,
 	}
 
 	// Meta info
@@ -89,7 +89,7 @@ class InvasionSpawner : Actor abstract
 		//$Arg3 Spawn Limit
 		//$Arg3Tooltip If not a positive value, spawn infinitely (won't count towards wave total).
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn between waves"; 4 = "Spawn sequentially"; 8 = "Spawn last"; 16 = "Wait for first active wave"; 32 = "No teleport fog"; 64 = "Silent initial spawn"; 128 = "Scale with wave"; 256 = "Scale with difficulty"; 512 = "Scale with players"; 1024 = "Set spawned as script caller"; 2048 = "Don't set monster target on spawn"; }
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn sequentially"; 4 = "Spawn between waves"; 8 = "Wait for first active wave"; 16 = "Spawn last"; 32 = "Silent initial spawn"; 64 = "No teleport fog"; 128 = "Scale with wave"; 256 = "Scale with difficulty"; 512 = "Scale with players"; 1024 = "Don't set monster target on spawn"; 2048 = "Set spawned as script caller"; }
 		//$Arg4Type 12
 		
 		FloatBobPhase 0;
