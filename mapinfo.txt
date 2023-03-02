@@ -5,6 +5,7 @@ GameInfo
 
 DoomEdNums
 {
+	23397 = GenericSpawner
 	23398 = FuturePlayerStart
 	23399 = MonsterPusher
 	23400 = PossessedSpawner

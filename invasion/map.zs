@@ -1,27 +1,28 @@
-enum EPusherArgs
-{
-	SECTOR_TAG,
-	PUSH_POW,
-	PUSH_ANG
-}
-
 class MonsterPusher : Actor
 {
+	enum EPusherArgs
+	{
+		SEC_TAG,
+		PUSH_POW,
+		PUSH_RAD
+	}
+
 	Default
 	{
-		//$NotAngled
 		//$Category Invasion
 		//$Title Monster Push Spot
-		//$Arg0 Sector tag
-		//$Arg0ToolTip If set to 0, pushes anything in the same sector as the Push Spot.
+		//$Arg0 Sector Tag
+		//$Arg0Type 13
+		//$Arg0Tooltip If set to 0, pushes anything in the same sector as the Push Spot.
 		//$Arg1 Push Power
 		//$Arg1Default 8
-		//$Arg2 Angle
-		//$Arg2Type 8
+		//$Arg1Tooltip Angle determines the direction monsters are pushed.
+		//$Arg2 Push Radius
+		//$Arg2Tooltip If a positive non-zero number, push within radius instead of the sector.
 
 		FloatBobPhase 0;
-		Radius 0;
-		Height 0;
+		Radius 16;
+		Height 32;
 		
 		+SYNCHRONIZED
 		+NOBLOCKMAP
@@ -52,36 +53,48 @@ class MonsterPusher : Actor
 		if (bDormant || !args[PUSH_POW] || IsFrozen())
 			return;
 		
-		Vector2 dir = AngleToVector(args[PUSH_ANG]);
-		if (args[PUSH_POW] < 0)
-			dir *= -1;
-		double power = abs(args[PUSH_POW]);
-		
-		if (args[SECTOR_TAG] != 0)
+		Vector2 dir = angle.ToVector();
+		if (args[PUSH_RAD] > 0)
 		{
-			let it = level.CreateSectorTagIterator(args[SECTOR_TAG]);
-			int sectorID;
-			while ((sectorID = it.Next()) >= 0)
-				PushMonsters(level.sectors[sectorID], dir, power);
+			double radSq = args[PUSH_RAD] * args[PUSH_RAD];
+			let it = BlockThingsIterator.Create(self, args[PUSH_RAD]);
+			while (it.Next())
+			{
+				Actor mo = it.thing;
+				if (mo && mo.bIsMonster && !mo.bDormant && !mo.IsFrozen() && Distance2DSquared(mo) <= radSq)
+					PushMonster(mo, dir, args[PUSH_POW]);
+			}
+		}
+		else if (args[SEC_TAG] != 0)
+		{
+			int secID;
+			let it = level.CreateSectorTagIterator(args[SEC_TAG]);
+			while ((secID = it.Next()) >= 0)
+				PushMonstersInSector(level.sectors[secID], dir, args[PUSH_POW]);
 		}
 		else
-			PushMonsters(level.PointInSector(pos.xy), dir, power);
+		{
+			PushMonstersInSector(curSector, dir, args[PUSH_POW]);
+		}
 	}
 	
-	private void PushMonsters(Sector sec, Vector2 dir, double power)
+	protected void PushMonstersInSector(Sector sec, Vector2 dir, double power)
 	{
-		Actor cur = sec.thinglist;
+		Actor cur = sec.thingList;
 		while (cur)
 		{
 			if (cur.bIsMonster && !cur.bDormant && !cur.IsFrozen())
-			{
-				double diff = cur.vel.xy dot dir;
-				if (diff < power)
-					cur.vel.xy += dir * min(power, power-diff);
-			}
+				PushMonster(cur, dir, power);
 			
-			cur = cur.snext;
+			cur = cur.sNext;
 		}
+	}
+
+	protected void PushMonster(Actor mo, Vector2 dir, double power)
+	{
+		double diff = mo.vel.xy dot dir;
+		if (diff < power)
+			mo.vel.xy += dir * min(power, power-diff);
 	}
 }
 
@@ -89,6 +102,12 @@ const STAT_FUTURE_PLAYER_START = Thinker.STAT_STATIC + 1;
 
 class FuturePlayerStart : Actor
 {
+	enum EFuturePlayerArgs
+	{
+		PLAY_NUM,
+		START_WAVE
+	}
+
 	Default
 	{
 		//$Category Invasion
@@ -98,12 +117,12 @@ class FuturePlayerStart : Actor
 		//$Arg0 Player Start Number
 		//$Arg0Default 1
 		//$Arg1 Wave
-		//$Arg1ToolTip The wave signifying when the matching player number will start spawning here.
-		//$Arg1Default 1
+		//$Arg1Tooltip The wave signifying when the matching player number will start spawning here.
+		//$Arg1Default 2
 
 		FloatBobPhase 0;
-		Radius 0;
-		Height 0;
+		Radius 16;
+		Height 56;
 		
 		+SYNCHRONIZED
 		+NOBLOCKMAP
@@ -123,7 +142,14 @@ class FuturePlayerStart : Actor
 	{
 		super.PostBeginPlay();
 
-		if (args[1] <= 0)
+		--args[PLAY_NUM]; // Players are 0-indexed
+		if (args[PLAY_NUM] < 0 || args[PLAY_NUM] >= MAXPLAYERS)
+		{
 			Destroy();
+			return;
+		}
+
+		if (args[START_WAVE] <= 0)
+			args[START_WAVE] = 1;
 	}
 }
