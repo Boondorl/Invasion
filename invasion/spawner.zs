@@ -182,11 +182,6 @@ class InvasionSpawner : Actor abstract
 		spawnTypes.Push(InvasionType.Create(type, probability));
 		weight += probability;
 	}
-
-	protected void CheckSpawnThreshold()
-	{
-		
-	}
 	
 	protected void SpawnActor()
 	{
@@ -242,11 +237,10 @@ class InvasionSpawner : Actor abstract
 		}
 
 		mo.bNeverRespawn = true;
-		if (def.bIsMonster)
+		if (!bDontCount)
 		{
-			// TODO: Verify this
 			mode.DisableCounter();
-			if (!(args[FLAGS] & FL_NO_TARGET) && mo.bIsMonster)
+			if (!(args[FLAGS] & FL_NO_TARGET))
 			{
 				Actor nearest = GetNearestPlayer();
 				if (nearest)
@@ -399,8 +393,6 @@ class InvasionSpawner : Actor abstract
 			timer = GetSpawnDelay();
 		if (limit)
 			spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
-
-		CheckSpawnThreshold();
 	}
 
 	void ActivateSpawner(bool val)

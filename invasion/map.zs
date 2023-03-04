@@ -75,7 +75,11 @@ class MonsterPusher : Actor
 		if (!args[PUSH_POW] || IsFrozen())
 			return;
 		
+		double power = abs(args[PUSH_POW]);
 		Vector2 dir = angle.ToVector();
+		if (args[PUSH_POW] < 0)
+			dir = -dir;
+
 		if (args[PUSH_RAD] > 0)
 		{
 			double radSq = args[PUSH_RAD] * args[PUSH_RAD];
@@ -84,17 +88,17 @@ class MonsterPusher : Actor
 			{
 				Actor mo = it.thing;
 				if (mo && mo.bIsMonster && !mo.bDormant && !mo.IsFrozen() && Distance2DSquared(mo) <= radSq)
-					PushMonster(mo, dir, args[PUSH_POW]);
+					PushMonster(mo, dir, power);
 			}
 		}
 		else if (sectors.Size())
 		{
 			foreach (sec : sectors)
-				PushMonstersInSector(sec, dir, args[PUSH_POW]);
+				PushMonstersInSector(sec, dir, power);
 		}
 		else
 		{
-			PushMonstersInSector(curSector, dir, args[PUSH_POW]);
+			PushMonstersInSector(curSector, dir, power);
 		}
 	}
 	
