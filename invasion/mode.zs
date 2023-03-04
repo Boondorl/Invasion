@@ -42,6 +42,7 @@ class Invasion : EventHandler
 	const COUNTDOWN_TIME = 5.0;
 	const VICTORY_TIME = 3.0;
 
+	private int mapSkill;
 	private bool bStarted;
 	private bool bPaused;
 	private bool bWaveStarted;
@@ -62,6 +63,12 @@ class Invasion : EventHandler
 	private Array<Actor> toClear;
 
 	bool bShowText;
+
+	override void WorldLoaded(WorldEvent e)
+	{
+		if (!e.isReopen)
+			mapSkill = 1 + int(log(G_SkillPropertyInt(SKILLP_SpawnFilter)) / log(2));
+	}
 
 	void ClearMode()
 	{
@@ -375,6 +382,11 @@ class Invasion : EventHandler
 	}
 	
 	// Getters
+	clearscope int GetSkill() const
+	{
+		return mapSkill;
+	}
+
 	clearscope int RemainingEnemies() const
 	{
 		return enemies;

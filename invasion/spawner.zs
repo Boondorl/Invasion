@@ -27,8 +27,6 @@ const STAT_IDLE_SPAWNERS = Thinker.STAT_STATIC + 2;
 
 class InvasionSpawner : Actor abstract
 {
-	const LOG_BASE = log(2);
-
 	enum ESpawnerArgs
 	{
 		SCRIPT,
@@ -326,14 +324,14 @@ class InvasionSpawner : Actor abstract
 		
 		if (args[FLAGS] & FL_DIFFICULTY)
 		{
-			int skill = 1 + int(log(G_SkillPropertyInt(SKILLP_SpawnFilter)) / LOG_BASE);
+			int skill = mode.GetSkill();
 			if (skill < 3)
 				s = int(ceil(s - args[SPAWN_LIMIT]*(1 - (1 / (1 + user_DifficultyScale*(3-skill))))));
 			else
 				s += int(ceil(args[SPAWN_LIMIT] * user_DifficultyScale * (skill-3)));
 		}
 		
-		if (args[FLAGS] & FL_PLAYER)
+		if ((args[FLAGS] & FL_PLAYER) && multiplayer)
 		{
 			int count;
 			for (int i = 0; i < MAXPLAYERS; ++i)
