@@ -23,6 +23,8 @@ class InvasionType
 	}
 }
 
+const STAT_IDLE_SPAWNERS = Thinker.STAT_STATIC + 2;
+
 class InvasionSpawner : Actor abstract
 {
 	const LOG_BASE = log(2);
@@ -60,11 +62,12 @@ class InvasionSpawner : Actor abstract
 	private bool bDontCount;
 
 	// Status
+	private Inventory item;
 	private int timer;
 	private int spawnLimit;
 	private bool bPaused;
 	private bool bSpawned; // Has spawned at least once
-	private bool bInThreshold;
+	private bool bActivated;
 
 	//$UserDefaultValue 1
 	int user_StartWave;
@@ -77,6 +80,7 @@ class InvasionSpawner : Actor abstract
 	//$UserDefaultValue 0.3
 	double user_PlayerScale;
 	int user_PlayerThreshold;
+	int user_InvasionID;
 	
 	Default
 	{
@@ -109,7 +113,7 @@ class InvasionSpawner : Actor abstract
 	{
 		super.BeginPlay();
 		
-		ChangeStatNum(STAT_FIRST_THINKING);
+		ChangeStatNum(STAT_IDLE_SPAWNERS);
 	}
 	
 	override void PostBeginPlay()
@@ -117,9 +121,7 @@ class InvasionSpawner : Actor abstract
 		super.PostBeginPlay();
 		
 		mode = Invasion.GetMode();
-		Reset();
-		if (!bDormant && mode.GameState() == GS_ACTIVE)
-			mode.ModifyMonsterCount(self);
+		Reset(true, true);
 
 		DropItem di = GetDropItems();	
 		while (di)
@@ -138,8 +140,7 @@ class InvasionSpawner : Actor abstract
 			return;
 		
 		bDormant = false;
-		if (mode)
-			mode.ModifyMonsterCount(self);
+		mode.ModifyMonsterCount(self);
 	}
 	
 	override void Deactivate(Actor deactivator)
@@ -148,56 +149,28 @@ class InvasionSpawner : Actor abstract
 			return;
 		
 		bDormant = true;
-		if (mode)
-			mode.ModifyMonsterCount(self);
+		mode.ModifyMonsterCount(self);
 	}
 	
 	override void Tick()
 	{
-		if (!mode)
+		if ((args[FLAGS] & FL_SEQUENCE) && target
+			&& ((target.bIsMonster && target.bKilled) || (item && item.owner)))
 		{
-			Destroy();
-			return;
+			target = null;
+			item = null;
 		}
 		
-		if (!mode.Started())
-			return;
-		
-		if (mode.WaveEnded())
+		if (!bDormant && !bPaused
+			&& (args[SPAWN_LIMIT] <= 0 || spawnLimit > 0)
+			&& (!(args[FLAGS] & FL_SEQUENCE) || !target)
+			&& (mode.GameState() == GS_ACTIVE || ((args[FLAGS] & FL_ALWAYS) && (!(args[FLAGS] & FL_WAIT_FIRST) || bSpawned)))
+			&& (!(args[FLAGS] & FL_WAIT_MONST) || mode.RemainingEnemies() <= mode.SpawnThreshold())
+			&& !IsFrozen()
+			&& --timer <= 0)
 		{
-			if (!(args[FLAGS] & FL_ALWAYS))
-				timer = GetSpawnDelay();
-			if (args[FLAGS] & FL_RESET)
-				spawnLimit = GetSpawnAmount(mode.CurrentWave());
-
-			CheckSpawnTreshold();
-		}
-		
-		if ((args[FLAGS] & FL_SEQUENCE) && target)
-		{
-			if (target.bIsMonster && target.bKilled)
-			{
-				target = null;
-			}
-			else
-			{
-				let i = Inventory(target);
-				if (i && i.owner)
-					target = null;
-			}
-		}
-		
-		if (bDestroyed || bDormant || bPaused
-			|| !InWaveRange(mode.CurrentWave())
-			|| (mode.GameState() != GS_ACTIVE && (!(args[FLAGS] & FL_ALWAYS) || ((args[FLAGS] & FL_WAIT_FIRST) && !bSpawned)))
-			|| ((args[FLAGS] & FL_WAIT_MONST) && mode.RemainingEnemies() > mode.SpawnThreshold())
-			|| IsFrozen())
-		{
-			return;
-		}
-		
-		if ((args[SPAWN_LIMIT] <= 0 || spawnLimit > 0) && (!(args[FLAGS] & FL_SEQUENCE) || !target) && --timer <= 0)
 			SpawnActor();
+		}
 	}
 
 	protected void AddSpawnType(class<Actor> type, int probability)
@@ -210,30 +183,19 @@ class InvasionSpawner : Actor abstract
 		weight += probability;
 	}
 
-	protected void CheckSpawnTreshold()
+	protected void CheckSpawnThreshold()
 	{
-		bInThreshold = user_PlayerThreshold <= 1;
-		if (!bInThreshold && multiplayer)
-		{
-			int count;
-			for (int i = 0; i < MAXPLAYERS; ++i)
-				count += playerInGame[i];
-
-			bInThreshold = count >= user_PlayerThreshold;
-		}
+		
 	}
 	
 	protected void SpawnActor()
 	{
 		int i;
-		int limit = spawnTypes.Size() - 1;
-		for (; i <= limit; ++i)
-		{
-			if (Random[InvasionSpawner](1, weight) <= spawnTypes[i].GetProbability())
-				break;
-		}
+		int w = Random[InvasionSpawner](0, weight-1);
+		for (; i < spawnTypes.Size() && w >= 0; ++i)
+			w -= spawnTypes[i].GetProbability();
 		
-		class<Actor> type = spawnTypes[i].GetType();
+		class<Actor> type = spawnTypes[--i].GetType();
 		if (!type)
 			type = "Unknown";
 		
@@ -241,90 +203,78 @@ class InvasionSpawner : Actor abstract
 		bool success = true;
 		if (def.bSolid)
 		{
-			bool curSolid = bSolid;
-			
-			bSolid = def.bSolid;
+			bSolid = true;
 			height = def.height;
 			if (!(radius ~== def.radius))
 				A_SetSize(def.radius);
 			
 			success = TestMobjLocation();
-			bSolid = curSolid;
+			bSolid = false;
 		}
 		
 		if (!success)
+		{
+			timer = gameTicRate; // Try again in another second
 			return;
+		}
 		
-		bool monst = def.bIsMonster;
-		let [spawned, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: args[ACTOR_TID]);
-		if (spawned)
+		let [temp, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: args[ACTOR_TID]);
+		// Handle these manually because they're too much of a hassle to handle otherwise
+		while (mo is "RandomSpawner")
 		{
-			// Handle these manually because they're too much of a hassle to handle otherwise
-			while (mo is "RandomSpawner")
+			let rs = RandomSpawner(mo);
+			if (rs.bounceCount >= RandomSpawner.MAX_RANDOMSPAWNERS_RECURSION)
+				rs.species = 'Unknown';
+
+			if (rs.species != 'None')
 			{
-				let rs = RandomSpawner(mo);
-				if (rs.bounceCount >= RandomSpawner.MAX_RANDOMSPAWNERS_RECURSION)
-					rs.species = 'Unknown';
+				mo = Spawn(rs.species, rs.pos);
+				mo.angle = rs.angle;
+				mo.bAmbush = rs.bAmbush;
+				mo.ChangeTID(rs.tid);
+				if (mo is "RandomSpawner")
+					mo.bounceCount = ++rs.bounceCount;
 
-				if (rs.species != 'None')
-				{
-					mo = Spawn(rs.species, rs.pos);
-					mo.angle = rs.angle;
-					mo.bAmbush = rs.bAmbush;
-					mo.ChangeTID(rs.tid);
-					if (mo is "RandomSpawner")
-						mo.bounceCount = ++rs.bounceCount;
-
-					rs.PostSpawn(mo);
-				}
-
-				rs.Destroy();
+				rs.PostSpawn(mo);
 			}
 
-			if (mo)
-			{
-				mo.bNeverRespawn = true;
-				if (monst)
-				{
-					mode.DisableCounter();
-					if (!(args[FLAGS] & FL_NO_TARGET))
-					{
-						Actor nearest = GetNearestPlayer();
-						if (nearest)
-							mo.lastHeard = nearest;
-					}
-				}
-				
-				if ((!(args[FLAGS] & FL_SILENT) || bSpawned) && !(args[FLAGS] & FL_NO_FOG))
-				{
-					let tf = Spawn(mo.teleFogDestType, mo.pos);
-					if (tf)
-					{
-						if (tf.pos.z < tf.floorZ)
-							tf.SetZ(tf.floorZ);
-						
-						tf.target = mo;
-					}
-				}
-			}
-			
-			if (spawnLimit > 0)
-				--spawnLimit;
-			if (args[FLAGS] & FL_SEQUENCE)
-				target = mo;
-			if (args[SCRIPT])
-			{
-				Actor caller = args[FLAGS] & FL_SET_CALLER ? mo : Actor(self);
-				level.ExecuteSpecial(226, caller, null, false, args[SCRIPT]);
-			}
-			
-			timer = args[SPAWN_DELAY];
-			bSpawned = true;
+			rs.Destroy();
 		}
-		else
+
+		mo.bNeverRespawn = true;
+		if (def.bIsMonster)
 		{
-			timer = gameTicRate; // Keep retrying every second
+			// TODO: Verify this
+			mode.DisableCounter();
+			if (!(args[FLAGS] & FL_NO_TARGET) && mo.bIsMonster)
+			{
+				Actor nearest = GetNearestPlayer();
+				if (nearest)
+					mo.lastHeard = nearest;
+			}
 		}
+		
+		if ((!(args[FLAGS] & FL_SILENT) || bSpawned) && !(args[FLAGS] & FL_NO_FOG))
+		{
+			let tf = Spawn(mo.teleFogDestType, mo.pos, ALLOW_REPLACE);
+			tf.target = mo;
+		}
+		
+		if (spawnLimit > 0)
+			--spawnLimit;
+		if (args[FLAGS] & FL_SEQUENCE)
+		{
+			target = mo;
+			item = Inventory(mo);
+		}
+		if (args[SCRIPT])
+		{
+			Actor caller = args[FLAGS] & FL_SET_CALLER ? mo : Actor(self);
+			level.ExecuteSpecial(226, caller, null, false, args[SCRIPT]);
+		}
+		
+		timer = args[SPAWN_DELAY];
+		bSpawned = true;
 	}
 	
 	private Actor GetNearestPlayer()
@@ -384,14 +334,9 @@ class InvasionSpawner : Actor abstract
 		{
 			int skill = 1 + int(log(G_SkillPropertyInt(SKILLP_SpawnFilter)) / LOG_BASE);
 			if (skill < 3)
-			{
-				double multi = 1 / (1 + user_DifficultyScale*(3-skill));
-				s = int(ceil(s - args[SPAWN_LIMIT]*(1-multi)));
-			}
+				s = int(ceil(s - args[SPAWN_LIMIT]*(1 - (1 / (1 + user_DifficultyScale*(3-skill))))));
 			else
-			{
 				s += int(ceil(args[SPAWN_LIMIT] * user_DifficultyScale * (skill-3)));
-			}
 		}
 		
 		if (args[FLAGS] & FL_PLAYER)
@@ -411,11 +356,26 @@ class InvasionSpawner : Actor abstract
 		return user_InitialSpawnDelay < 0 ? args[SPAWN_DELAY] : user_InitialSpawnDelay;
 	}
 	
-	clearscope bool InWaveRange(int wave) const
+	clearscope bool ShouldActivate(int wave) const
 	{
-		return bInThreshold
+		bool should = user_PlayerThreshold <= 1;
+		if (!should && multiplayer)
+		{
+			int count;
+			for (int i = 0; i < MAXPLAYERS; ++i)
+				count += playerInGame[i];
+
+			should = count >= user_PlayerThreshold;
+		}
+
+		return should
 				&& (user_StartWave <= 0 || wave >= user_StartWave)
 				&& (user_EndWave <= 0 || wave < user_EndWave);
+	}
+
+	clearscope bool Activated() const
+	{
+		return bActivated;
 	}
 	
 	clearscope int RemainingSpawns() const
@@ -433,11 +393,24 @@ class InvasionSpawner : Actor abstract
 		return !bDontCount;
 	}
 
-	void Reset()
+	void Reset(bool time, bool limit)
 	{
-		timer = GetSpawnDelay();
-		spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
-		CheckSpawnTreshold();
+		if (time)
+			timer = GetSpawnDelay();
+		if (limit)
+			spawnLimit = GetSpawnAmount(max(mode.CurrentWave(), 1));
+
+		CheckSpawnThreshold();
+	}
+
+	void ActivateSpawner(bool val)
+	{
+		bActivated = val;
+
+		if (bActivated)
+			ChangeStatNum(STAT_FIRST_THINKING);
+		else
+			ChangeStatNum(STAT_IDLE_SPAWNERS);
 	}
 	
 	void ClearSpawns()

@@ -1,3 +1,32 @@
+class FuturePlayerStarts
+{
+	private int wave;
+	private Map<int, FuturePlayerStart> starts;
+
+	static FuturePlayerStarts Create(int wave)
+	{
+		let fps = new("FuturePlayerStarts");
+		fps.wave = wave;
+
+		return fps;
+	}
+
+	void AddStart(FuturePlayerStart start)
+	{
+		starts.Insert(start.args[FuturePlayerStart.PLAY_NUM], start);
+	}
+
+	int GetWave() const
+	{
+		return wave;
+	}
+
+	FuturePlayerStart GetStart(int playNum) const
+	{
+		return starts.GetIfExists(playNum);
+	}
+}
+
 enum EModeStates
 {
 	GS_INVALID = -1,
@@ -8,25 +37,28 @@ enum EModeStates
 	GS_VICTORY
 }
 
-const COUNTDOWN_TIME = 5.0;
-const VICTORY_TIME = 3.0;
-
 class Invasion : EventHandler
 {
+	const COUNTDOWN_TIME = 5.0;
+	const VICTORY_TIME = 3.0;
+
 	private bool bStarted;
 	private bool bPaused;
 	private bool bWaveStarted;
 	private bool bWaveFinished;
-	private int skipCounter;
 	private int length;
 	private int waveTimer;
 	private int modeState;
+	private int modeID;
 	
-	private int enemies;
+	private int skipCounter;
+	private int enemies, healers;
 	private int lastSpawnThreshold;
 	private int wave;
 	private int timer;
 
+	private Array<FuturePlayerStarts> playerStarts;
+	private Array<InvasionSpawner> spawners;
 	private Array<Actor> toClear;
 
 	bool bShowText;
@@ -34,11 +66,18 @@ class Invasion : EventHandler
 	void ClearMode()
 	{
 		bStarted = bPaused = bWaveStarted = bWaveFinished = bShowText = false;
-		skipCounter = length = waveTimer = enemies = lastSpawnThreshold = wave = timer = 0;
+		skipCounter = length = waveTimer = enemies = healers = lastSpawnThreshold = wave = timer = modeID = 0;
 		modeState = GS_WAITING;
-		toClear.Clear();
 
-		ResetSpawners();
+		foreach (s : spawners)
+		{
+			s.Reset(true, true);
+			s.ActivateSpawner(false);
+		}
+
+		playerStarts.Clear();
+		spawners.Clear();
+		toClear.Clear();
 	}
 	
 	override void WorldTick()
@@ -78,6 +117,14 @@ class Invasion : EventHandler
 		modeState = GS_COUNTDOWN;
 		RemoveCorpses();
 		toClear.Clear();
+
+		foreach (s : spawners)
+		{
+			s.Reset(!(s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_ALWAYS),
+					s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_RESET);
+
+			s.ActivateSpawner(s.ShouldActivate(wave));
+		}
 	}
 	
 	protected void DoCountdown()
@@ -101,17 +148,15 @@ class Invasion : EventHandler
 	
 	void UpdateMonsterCount()
 	{
-		InvasionSpawner inv;
 		int counter, thresholdCounter;
-		let it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
-		while (inv = InvasionSpawner(it.Next()))
+		foreach (s : spawners)
 		{
-			if (inv.bDormant || !inv.CountMonster() || !inv.InWaveRange(wave))
+			if (s.bDormant || !s.Activated()|| !s.CountMonster())
 				continue;
 
-			int add = inv.RemainingSpawns();
+			int add = s.RemainingSpawns();
 			counter += add;
-			if (inv.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_WAIT_MONST)
+			if (s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_WAIT_MONST)
 				thresholdCounter += add;
 		}
 		
@@ -121,8 +166,11 @@ class Invasion : EventHandler
 	
 	void ModifyMonsterCount(InvasionSpawner s)
 	{
-		if (modeState != GS_ACTIVE || !s.CountMonster() || !s.InWaveRange(wave))
+		if (modeState != GS_ACTIVE || s.user_InvasionID != modeID
+			|| !s.Activated() || !s.CountMonster())
+		{
 			return;
+		}
 		
 		int add = s.RemainingSpawns();
 		if (s.bDormant)
@@ -137,7 +185,7 @@ class Invasion : EventHandler
 	{
 		foreach (mo : toClear)
 		{
-			if (!mo || mo.bKilled)
+			if (mo.bKilled)
 				continue;
 
 			mo.damageTypeReceived = 'None';
@@ -146,32 +194,22 @@ class Invasion : EventHandler
 			mo.bKilled = true;
 		}
 		
-		let it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
-		InvasionSpawner s;
-		while (s = InvasionSpawner(it.Next()))
+		foreach (s : spawners)
 		{
-			if (!s.bDormant && s.CountMonster() && s.InWaveRange(wave))
+			if (!s.bDormant && s.Activated() && s.CountMonster())
 				s.ClearSpawns();
 		}
 		
-		enemies = lastSpawnThreshold = 0;
+		enemies = healers = lastSpawnThreshold = skipCounter = 0;
 	}
 	
 	void RemoveCorpses()
 	{
 		foreach (mo : toClear)
 		{
-			if (mo && mo.bKilled)
+			if (mo.bKilled)
 				level.ExecuteSpecial(226, mo, null, false, -int('ExecuteCallbackFunction'));
 		}
-	}
-
-	void ResetSpawners()
-	{
-		let it = ThinkerIterator.Create("InvasionSpawner", Thinker.STAT_FIRST_THINKING);
-		InvasionSpawner s;
-		while (s = InvasionSpawner(it.Next()))
-			s.Reset();
 	}
 	
 	void DisableCounter()
@@ -181,30 +219,33 @@ class Invasion : EventHandler
 	
 	override void WorldThingSpawned(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE)
-			return;
-
-		if (skipCounter > 0)
+		if (e.thing && e.thing.bIsMonster && modeState == GS_ACTIVE && skipCounter > 0)
 		{
-			toClear.Push(e.thing);
 			--skipCounter;
+			toClear.Push(e.thing);
+			if (e.thing.FindState("Heal"))
+				++healers;
 		}
 	}
 	
 	override void WorldThingRevived(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE || toClear.Find(e.thing) >= toClear.Size())
-			return;
-		
-		++enemies;
+		if (e.thing && e.thing.bIsMonster && modeState == GS_ACTIVE && toClear.Find(e.thing) < toClear.Size())
+		{
+			++enemies;
+			if (e.thing.FindState("Heal"))
+				++healers;
+		}
 	}
 	
 	override void WorldThingDied(WorldEvent e)
 	{
-		if (!e.thing || !e.thing.bIsMonster || modeState != GS_ACTIVE || toClear.Find(e.thing) >= toClear.Size())
-			return;
-		
-		--enemies;
+		if (e.thing && e.thing.bIsMonster && modeState == GS_ACTIVE && toClear.Find(e.thing) < toClear.Size())
+		{
+			--enemies;
+			if (e.thing.FindState("Heal"))
+				--healers;
+		}
 	}
 	
 	override void WorldThingDestroyed(WorldEvent e)
@@ -217,7 +258,11 @@ class Invasion : EventHandler
 		{
 			toClear.Delete(i);
 			if (!e.thing.bKilled)
+			{
 				--enemies;
+				if (e.thing.FindState("Heal"))
+					--healers;
+			}
 		}
 	}
 	
@@ -250,7 +295,7 @@ class Invasion : EventHandler
 					else if (timer <= ceil(COUNTDOWN_TIME*gameTicRate))
 						text = StringTable.Localize("$IN_PREPARE");
 					else
-						text = String.Format(StringTable.Localize("$IN_COUNTDOWN"), ceil(double(timer) / TICRATE));
+						text = String.Format(StringTable.Localize("$IN_COUNTDOWN"), ceil(double(timer) / gameTicRate));
 					break;
 					
 				case GS_ACTIVE:
@@ -267,6 +312,7 @@ class Invasion : EventHandler
 					{
 						text = String.Format(StringTable.Localize("$IN_REMAINING"), enemies);
 					}
+
 					break;
 					
 				case GS_VICTORY:
@@ -280,11 +326,19 @@ class Invasion : EventHandler
 			
 			x = int(w - bigFont.StringWidth(text)*scale.x*0.5);
 			Screen.DrawText(bigFont, -1, x, y, text, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
+			y += height;
+
+			if (modeState == GS_ACTIVE && healers > 0)
+			{
+				string heal = String.Format(StringTable.Localize("$IN_HEALERS"), healers);
+				x = int(w - bigFont.StringWidth(heal)*scale.x*0.5);
+				Screen.DrawText(bigFont, -1, x, y, heal, DTA_ScaleX, scale.x, DTA_ScaleY, scale.y);
+				y += height;
+			}
 			
 			if (modeState == GS_COUNTDOWN && timer <= ceil(COUNTDOWN_TIME*gameTicRate) && !bWaveFinished)
 			{
-				y += height;
-				string counter = String.Format("%d", ceil(double(timer) / TICRATE));
+				string counter = String.Format("%d", ceil(double(timer) / gameTicRate));
 				x = int(w - bigFont.StringWidth(counter)*scale.x);
 				Screen.DrawText(bigFont, -1, x, y, counter, DTA_ScaleX, scale.x*2, DTA_ScaleY, scale.y*2);
 			}
@@ -293,33 +347,29 @@ class Invasion : EventHandler
 
 	override void PlayerRespawned(PlayerEvent e)
 	{
-		FuturePlayerStart spot, def, current;
-		let it = ThinkerIterator.Create("FuturePlayerStart", STAT_FUTURE_PLAYER_START);
-		while (spot = FuturePlayerStart(it.Next()))
+		FuturePlayerStart spot;
+		if (playerStarts.Size())
 		{
-			if (spot.args[FuturePlayerStart.PLAY_NUM] == 0
-				&& spot.args[FuturePlayerStart.START_WAVE] <= wave
-				&& (!def || def.args[FuturePlayerStart.START_WAVE] < spot.args[FuturePlayerStart.START_WAVE]))
+			FuturePlayerStarts starts;
+			foreach (fps : playerStarts)
 			{
-				def = spot;
+				if (fps.GetWave() > wave)
+					break;
+
+				starts = fps;
 			}
 
-			if (spot.args[FuturePlayerStart.PLAY_NUM] != e.playerNumber
-				|| spot.args[FuturePlayerStart.START_WAVE] > wave)
+			if (starts)
 			{
-				continue;
+				spot = starts.GetStart(e.playerNumber);
+				if (!spot)
+					spot = starts.GetStart(0);
 			}
-			
-			if (!current || current.args[FuturePlayerStart.START_WAVE] < spot.args[FuturePlayerStart.START_WAVE])
-				current = spot;
 		}
 
-		if (!current)
-			current = def;
-
 		PlayerPawn mo = players[e.playerNumber].mo;
-		if (current)
-			mo.Teleport(current.pos, current.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
+		if (spot)
+			mo.Teleport(spot.pos, spot.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
 		else if (!multiplayer)
 			mo.Teleport(mo.pos, mo.angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
 	}
@@ -328,6 +378,11 @@ class Invasion : EventHandler
 	clearscope int RemainingEnemies() const
 	{
 		return enemies;
+	}
+
+	clearscope int RemainingHealers() const
+	{
+		return healers;
 	}
 	
 	clearscope int SpawnThreshold() const
@@ -347,15 +402,17 @@ class Invasion : EventHandler
 
 	clearscope int GetTimer() const
 	{
-		if (modeState != GS_COUNTDOWN)
-			return 0;
-
-		return int(ceil(double(timer) / gameTicRate));
+		return modeState != GS_COUNTDOWN ? 0 : int(ceil(double(timer) / gameTicRate));
 	}
 	
 	clearscope int GameState() const
 	{
 		return modeState;
+	}
+
+	clearscope int GameID() const
+	{
+		return modeID;
 	}
 	
 	clearscope bool WaveStarted() const
@@ -378,17 +435,57 @@ class Invasion : EventHandler
 		return bPaused;
 	}
 	
-	void Start(int l, int t, bool v = true, bool nd = false)
+	void Start(int l, int t, bool v = true, bool nd = false, int id = 0)
 	{
 		if (bStarted)
 			return;
 		
 		bStarted = true;
 		modeState = GS_COUNTDOWN;
+		modeID = id;
 		wave = 1;
 		length = l;
 		waveTimer = t;
 		bShowText = v;
+
+		// Cache spawners local to the invasion
+		InvasionSpawner s;
+		let it = ThinkerIterator.Create("InvasionSpawner", STAT_IDLE_SPAWNERS);
+		while (s = InvasionSpawner(it.Next()))
+		{
+			if (s.user_InvasionID == modeID)
+			{
+				spawners.Push(s);
+				s.ActivateSpawner(s.ShouldActivate(wave));
+			}
+		}
+
+		// Cache player starts local to the invasion
+		FuturePlayerStart start;
+		it = ThinkerIterator.Create("FuturePlayerStart", STAT_FUTURE_PLAYER_START);
+		while (start = FuturePlayerStart(it.Next()))
+		{
+			if (start.user_InvasionID != modeID)
+				continue;
+
+			int i;
+			for (; i < playerStarts.Size(); ++i)
+			{
+				if (playerStarts[i].GetWave() > start.args[FuturePlayerStart.START_WAVE])
+				{
+					--i;
+					if (i < 0 || playerStarts[i].GetWave() < start.args[FuturePlayerStart.START_WAVE])
+						playerStarts.Insert(++i, FuturePlayerStarts.Create(start.args[FuturePlayerStart.START_WAVE]));
+
+					break;
+				}
+			}
+
+			if (i >= playerStarts.Size())
+				i = playerStarts.Push(FuturePlayerStarts.Create(start.args[FuturePlayerStart.START_WAVE]));
+
+			playerStarts[i].AddStart(start);
+		}
 
 		if (nd)
 			WaveStart();
@@ -441,7 +538,6 @@ class Invasion : EventHandler
 		}
 		
 		ClearMonsters();
-		skipCounter = 0;
 	}
 	
 	// ACS Helpers
@@ -494,10 +590,15 @@ class Invasion : EventHandler
 	{
 		return Invasion.GetMode().Paused();
 	}
-	
-	static void StartGame(int length, int timer, bool textVis = true, bool noDel = false)
+
+	clearscope static bool GetTextVisible()
 	{
-		Invasion.GetMode().Start(length, timer, textVis, noDel);
+		return Invasion.GetMode().bShowText;
+	}
+	
+	static void StartGame(int length, int timer, bool textVis = true, bool noDel = false, int id = 0)
+	{
+		Invasion.GetMode().Start(length, timer, textVis, noDel, id);
 	}
 	
 	static void EndGame(bool kill = true)
@@ -536,10 +637,5 @@ class Invasion : EventHandler
 	static void TextVisible(bool vis)
 	{
 		Invasion.GetMode().bShowText = vis;
-	}
-
-	clearscope static bool GetTextVisible()
-	{
-		return Invasion.GetMode().bShowText;
 	}
 }

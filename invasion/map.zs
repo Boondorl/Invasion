@@ -108,6 +108,8 @@ class FuturePlayerStart : Actor
 		START_WAVE
 	}
 
+	int user_InvasionID;
+
 	Default
 	{
 		//$Category Invasion
