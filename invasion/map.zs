@@ -1,3 +1,5 @@
+const STAT_IDLE_PUSHER = Thinker.STAT_STATIC + 3;
+
 class MonsterPusher : Actor
 {
 	enum EPusherArgs
@@ -6,6 +8,8 @@ class MonsterPusher : Actor
 		PUSH_POW,
 		PUSH_RAD
 	}
+
+	private Array<Sector> sectors;
 
 	Default
 	{
@@ -35,22 +39,40 @@ class MonsterPusher : Actor
 	{
 		super.BeginPlay();
 
-		ChangeStatNum(STAT_FIRST_THINKING);
+		if (bDormant)
+			Deactivate(null);
+		else
+			Activate(null);
+	}
+
+	override void PostBeginPlay()
+	{
+		super.PostBeginPlay();
+
+		if (args[SEC_TAG])
+		{
+			int secID;
+			let it = level.CreateSectorTagIterator(args[SEC_TAG]);
+			while ((secID = it.Next()) >= 0)
+				sectors.Push(level.sectors[secID]);
+		}
 	}
 	
 	override void Activate(Actor activator)
 	{
 		bDormant = false;
+		ChangeStatNum(STAT_FIRST_THINKING);
 	}
 	
 	override void Deactivate(Actor deactivator)
 	{
 		bDormant = true;
+		ChangeStatNum(STAT_IDLE_PUSHER);
 	}
 	
 	override void Tick()
 	{
-		if (bDormant || !args[PUSH_POW] || IsFrozen())
+		if (!args[PUSH_POW] || IsFrozen())
 			return;
 		
 		Vector2 dir = angle.ToVector();
@@ -65,12 +87,10 @@ class MonsterPusher : Actor
 					PushMonster(mo, dir, args[PUSH_POW]);
 			}
 		}
-		else if (args[SEC_TAG] != 0)
+		else if (sectors.Size())
 		{
-			int secID;
-			let it = level.CreateSectorTagIterator(args[SEC_TAG]);
-			while ((secID = it.Next()) >= 0)
-				PushMonstersInSector(level.sectors[secID], dir, args[PUSH_POW]);
+			foreach (sec : sectors)
+				PushMonstersInSector(sec, dir, args[PUSH_POW]);
 		}
 		else
 		{
