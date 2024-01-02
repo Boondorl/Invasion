@@ -24,9 +24,9 @@ class MonsterPusher : Actor
 		//$Arg2 Push Radius
 		//$Arg2Tooltip If a positive non-zero number, push within radius instead of the sector.
 
-		FloatBobPhase 0;
-		Radius 16;
-		Height 32;
+		FloatBobPhase 0u;
+		Radius 16.0;
+		Height 32.0;
 		
 		+SYNCHRONIZED
 		+NOBLOCKMAP
@@ -72,7 +72,7 @@ class MonsterPusher : Actor
 	
 	override void Tick()
 	{
-		if (!args[PUSH_POW] || IsFrozen())
+		if ((freezeTics > 0u && --freezeTics >= 0u) || !args[PUSH_POW] || IsFrozen())
 			return;
 		
 		double power = abs(args[PUSH_POW]);
@@ -146,9 +146,9 @@ class FuturePlayerStart : Actor
 		//$Arg1Tooltip The wave signifying when the matching player number will start spawning here.
 		//$Arg1Default 2
 
-		FloatBobPhase 0;
-		Radius 16;
-		Height 56;
+		FloatBobPhase 0u;
+		Radius 16.0;
+		Height 56.0;
 		
 		+SYNCHRONIZED
 		+NOBLOCKMAP

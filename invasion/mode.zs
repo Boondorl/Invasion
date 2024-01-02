@@ -42,6 +42,7 @@ class Invasion : EventHandler
 	const COUNTDOWN_TIME = 5.0;
 	const VICTORY_TIME = 3.0;
 
+	// Game mode info
 	private int mapSkill;
 	private bool bStarted;
 	private bool bPaused;
@@ -49,9 +50,10 @@ class Invasion : EventHandler
 	private bool bWaveFinished;
 	private int length;
 	private int waveTimer;
-	private int modeState;
+	private EModeStates modeState;
 	private int modeID;
 	
+	// Wave info
 	private int skipCounter;
 	private int enemies, healers;
 	private int lastSpawnThreshold;
@@ -278,7 +280,7 @@ class Invasion : EventHandler
 		if (!bStarted || modeState == GS_INVALID || !bShowText)
 			return;
 		
-		Vector2 scale = (2,2.4) * (Screen.GetHeight() / 1080.);		
+		Vector2 scale = (2.0, 2.4) * (Screen.GetHeight() / 1080.0);		
 		int height = int(bigFont.GetHeight() * scale.y);
 		int w = int(Screen.GetWidth() * 0.5);
 
@@ -299,10 +301,10 @@ class Invasion : EventHandler
 				case GS_COUNTDOWN:
 					if (bWaveFinished)
 						text = StringTable.Localize("$IN_DEFEATED");
-					else if (timer <= ceil(COUNTDOWN_TIME*gameTicRate))
+					else if (timer <= int(ceil(COUNTDOWN_TIME*gameTicRate)))
 						text = StringTable.Localize("$IN_PREPARE");
 					else
-						text = String.Format(StringTable.Localize("$IN_COUNTDOWN"), ceil(double(timer) / gameTicRate));
+						text = String.Format(StringTable.Localize("$IN_COUNTDOWN"), int(ceil(double(timer) / gameTicRate)));
 					break;
 					
 				case GS_ACTIVE:
@@ -319,7 +321,6 @@ class Invasion : EventHandler
 					{
 						text = String.Format(StringTable.Localize("$IN_REMAINING"), enemies);
 					}
-
 					break;
 					
 				case GS_VICTORY:
@@ -343,9 +344,9 @@ class Invasion : EventHandler
 				y += height;
 			}
 			
-			if (modeState == GS_COUNTDOWN && timer <= ceil(COUNTDOWN_TIME*gameTicRate) && !bWaveFinished)
+			if (modeState == GS_COUNTDOWN && timer <= int(ceil(COUNTDOWN_TIME*gameTicRate)) && !bWaveFinished)
 			{
-				string counter = String.Format("%d", ceil(double(timer) / gameTicRate));
+				string counter = String.Format("%d", int(ceil(double(timer) / gameTicRate)));
 				x = int(w - bigFont.StringWidth(counter)*scale.x);
 				Screen.DrawText(bigFont, -1, x, y, counter, DTA_ScaleX, scale.x*2, DTA_ScaleY, scale.y*2);
 			}

@@ -38,19 +38,19 @@ class InvasionSpawner : Actor abstract
 
 	enum EFlags
 	{
-		FL_NONE = 0,
-		FL_RESET = 1,
-		FL_SEQUENCE = 1<<1,
-		FL_ALWAYS = 1<<2,
-		FL_WAIT_FIRST = 1<<3,
-		FL_WAIT_MONST = 1<<4,
-		FL_SILENT = 1<<5,
-		FL_NO_FOG = 1<<6,
-		FL_WAVE = 1<<7,
-		FL_DIFFICULTY = 1<<8,
-		FL_PLAYER = 1<<9,
-		FL_NO_TARGET = 1<<10,
-		FL_SET_CALLER = 1<<11,
+		FL_NONE 		= 0,
+		FL_RESET 		= 1,
+		FL_SEQUENCE 	= 1 << 1,
+		FL_ALWAYS 		= 1 << 2,
+		FL_WAIT_FIRST 	= 1 << 3,
+		FL_WAIT_MONST 	= 1 << 4,
+		FL_SILENT 		= 1 << 5,
+		FL_NO_FOG 		= 1 << 6,
+		FL_WAVE 		= 1 << 7,
+		FL_DIFFICULTY 	= 1 << 8,
+		FL_PLAYER 		= 1 << 9,
+		FL_NO_TARGET 	= 1 << 10,
+		FL_SET_CALLER 	= 1 << 11,
 	}
 
 	// Meta info
@@ -60,11 +60,11 @@ class InvasionSpawner : Actor abstract
 	private bool bDontCount;
 
 	// Status
-	private Inventory item;
+	private Inventory item; // Track if the currently spawned Actor is an item when spawning sequentially.
 	private int timer;
 	private int spawnLimit;
 	private bool bPaused;
-	private bool bSpawned; // Has spawned at least once
+	private bool bSpawned; // Has spawned at least once.
 	private bool bActivated;
 
 	//$UserDefaultValue 1
@@ -93,12 +93,12 @@ class InvasionSpawner : Actor abstract
 		//$Arg3 Spawn Limit
 		//$Arg3Tooltip If not a positive value, spawn infinitely (won't count towards wave total).
 		//$Arg4 Flags
-		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn sequentially"; 4 = "Spawn between waves"; 8 = "Wait for first active wave"; 16 = "Spawn last"; 32 = "Silent initial spawn"; 64 = "No teleport fog"; 128 = "Scale with wave"; 256 = "Scale with difficulty"; 512 = "Scale with players"; 1024 = "Don't set monster target on spawn"; 2048 = "Set spawned as script caller"; }
+		//$Arg4Enum { 1 = "Reset on new wave"; 2 = "Spawn sequentially"; 4 = "Spawn between waves"; 8 = "Wait for first wave to start"; 16 = "Spawn last"; 32 = "Silent initial spawn"; 64 = "No teleport fog"; 128 = "Scale with wave"; 256 = "Scale with difficulty"; 512 = "Scale with players"; 1024 = "Don't set monster target on spawn"; 2048 = "Set spawned Actor as script caller"; }
 		//$Arg4Type 12
 		
-		FloatBobPhase 0;
-		Radius 32;
-		Height 64;
+		FloatBobPhase 0u;
+		Radius 32.0;
+		Height 64.0;
 		
 		+SYNCHRONIZED
 		+NOBLOCKMAP
@@ -158,13 +158,15 @@ class InvasionSpawner : Actor abstract
 			target = null;
 			item = null;
 		}
+
+		if ((freezeTics > 0u && --freezeTics >= 0u) || IsFrozen())
+			return;
 		
 		if (!bDormant && !bPaused
 			&& (args[SPAWN_LIMIT] <= 0 || spawnLimit > 0)
 			&& (!(args[FLAGS] & FL_SEQUENCE) || !target)
 			&& (mode.GameState() == GS_ACTIVE || ((args[FLAGS] & FL_ALWAYS) && (!(args[FLAGS] & FL_WAIT_FIRST) || bSpawned)))
 			&& (!(args[FLAGS] & FL_WAIT_MONST) || mode.RemainingEnemies() <= mode.SpawnThreshold())
-			&& !IsFrozen()
 			&& --timer <= 0)
 		{
 			SpawnActor();
@@ -207,12 +209,12 @@ class InvasionSpawner : Actor abstract
 		
 		if (!success)
 		{
-			timer = gameTicRate; // Try again in another second
+			timer = gameTicRate; // Try again in another second.
 			return;
 		}
 		
 		let [temp, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: args[ACTOR_TID]);
-		// Handle these manually because they're too much of a hassle to handle otherwise
+		// Handle these manually because they're too much of a hassle to handle otherwise.
 		while (mo is "RandomSpawner")
 		{
 			let rs = RandomSpawner(mo);
