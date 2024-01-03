@@ -109,18 +109,8 @@ class InvasionSpawner : Actor abstract
 	
 	override void BeginPlay()
 	{
-		super.BeginPlay();
-		
-		ChangeStatNum(STAT_IDLE_SPAWNERS);
-	}
-	
-	override void PostBeginPlay()
-	{
-		super.PostBeginPlay();
-		
 		mode = Invasion.GetMode();
-		Reset(true, true);
-
+		
 		DropItem di = GetDropItems();	
 		while (di)
 		{
@@ -130,8 +120,20 @@ class InvasionSpawner : Actor abstract
 			
 			di = di.next;
 		}
+
+		if (!spawnTypes.Size())
+		{
+			Destroy();
+			return;
+		}
+
+		Reset(true, true);
+
+		ChangeStatNum(STAT_IDLE_SPAWNERS);
+
+		super.BeginPlay();
 	}
-	
+
 	override void Activate(Actor activator)
 	{
 		if (!bDormant)
@@ -189,7 +191,7 @@ class InvasionSpawner : Actor abstract
 		int w = Random[InvasionSpawner](0, weight-1);
 		for (; i < spawnTypes.Size() && w >= 0; ++i)
 			w -= spawnTypes[i].GetProbability();
-		
+
 		class<Actor> type = spawnTypes[--i].GetType();
 		if (!type)
 			type = "Unknown";

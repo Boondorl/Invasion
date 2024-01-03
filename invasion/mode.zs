@@ -418,7 +418,7 @@ class Invasion : EventHandler
 		return modeState != GS_COUNTDOWN ? 0 : int(ceil(double(timer) / gameTicRate));
 	}
 	
-	clearscope int GameState() const
+	clearscope EModeStates GameState() const
 	{
 		return modeState;
 	}
@@ -462,6 +462,7 @@ class Invasion : EventHandler
 		bShowText = v;
 
 		// Cache spawners local to the invasion
+		Array<InvasionSpawner> toActivate;
 		InvasionSpawner s;
 		let it = ThinkerIterator.Create("InvasionSpawner", STAT_IDLE_SPAWNERS);
 		while (s = InvasionSpawner(it.Next()))
@@ -469,9 +470,14 @@ class Invasion : EventHandler
 			if (s.user_InvasionID == modeID)
 			{
 				spawners.Push(s);
-				s.ActivateSpawner(s.ShouldActivate(wave));
+				// Don't change these while iterating.
+				if (s.ShouldActivate(wave))
+					toActivate.Push(s);
 			}
 		}
+
+		foreach (invSpawner : toActivate)
+			invSpawner.ActivateSpawner(true);
 
 		// Cache player starts local to the invasion
 		FuturePlayerStart start;

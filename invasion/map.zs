@@ -35,16 +35,6 @@ class MonsterPusher : Actor
 		+DONTBLAST
 	}
 
-	override void BeginPlay()
-	{
-		super.BeginPlay();
-
-		if (bDormant)
-			Deactivate(null);
-		else
-			Activate(null);
-	}
-
 	override void PostBeginPlay()
 	{
 		super.PostBeginPlay();
