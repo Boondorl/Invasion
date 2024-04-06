@@ -355,13 +355,8 @@ class Invasion : GameMode
 	{
 		foreach (mo : waveMonsters)
 		{
-			if (!mo || mo.bKilled)
-				continue;
-
-			mo.damageTypeReceived = 'None';
-			mo.special1 = mo.health;
-			mo.health = 0;
-			mo.bKilled = true;
+			if (mo && !mo.bKilled)
+				mo.A_Die();
 		}
 		
 		foreach (s : spawners)
@@ -624,9 +619,16 @@ class Invasion : GameMode
     static void SetMainInvasion(int id)
     {
         let handler = GameModeHandler.Get();
-        let [mode, index] = handler.FindGameMode(id, "Invasion");
-        if (mode)
-            handler.SetMainGameMode(index);
+		if (id < 0)
+		{
+			handler.SetMainGameMode(GameModeHandler.INVALID_MODE);
+		}
+		else
+		{
+			let [mode, index] = handler.FindGameMode(id, "Invasion");
+			if (mode)
+				handler.SetMainGameMode(index);
+		}
     }
 	
 	static void Start(int id, int totalWaves, int waveTimer, int initialDelay, bool setMain = true)
