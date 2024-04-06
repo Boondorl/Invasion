@@ -276,7 +276,10 @@ class Invasion : GameMode
             return;
 
         foreach (s : spawners)
-            s.Tick();
+        {
+            if (!s.bDormant && s.Activated())
+                s.Tick();
+        }
     }
 
     protected void DoVictory()
@@ -632,7 +635,7 @@ class Invasion : GameMode
             handler.SetMainGameMode(index);
     }
 	
-	static void Start(int id, int totalWaves, double waveTimer, double initialDelay, bool setMain = true)
+	static void Start(int id, int totalWaves, int waveTimer, int initialDelay, bool setMain = true)
 	{
         let mode = Invasion(GameModeHandler.Get().AddGameMode("Invasion", id, setMain));
         if (mode)
