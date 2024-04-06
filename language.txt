@@ -8,5 +8,5 @@ IN_ENDLESS = "Wave %d";
 IN_ONE_REMAINING = "%d enemy remaining";
 IN_REMAINING = "%d enemies remaining";
 IN_ONE_HEALER = "%d healer remaining";
-IN_HEALERS = "%d healers remaining";
+IN_HEALER = "%d healers remaining";
 IN_VICTORY = "Invasion defeated!";
