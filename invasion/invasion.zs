@@ -13,8 +13,8 @@ class FuturePlayerStarts
 
 	void AddStart(FuturePlayerStart start)
 	{
-        uint num = start.Args[FuturePlayerStart.PLAY_NUM];
-        if (num < MAXPLAYERS)
+        int num = start.Args[FuturePlayerStart.PLAY_NUM];
+        if (num >= 0 && num < MAXPLAYERS)
             starts[num] = start;
 	}
 
@@ -23,9 +23,9 @@ class FuturePlayerStarts
 		return wave;
 	}
 
-	clearscope FuturePlayerStart GetStart(uint playNum) const
+	clearscope FuturePlayerStart GetStart(int playNum) const
 	{
-		return playNum >= MAXPLAYERS ? null : starts[playNum];
+		return playNum < 0 || playNum >= MAXPLAYERS ? null : starts[playNum];
 	}
 }
 
@@ -458,7 +458,7 @@ class Invasion : GameMode
 			{
 				spot = starts.GetStart(e.PlayerNumber);
 				if (!spot)
-					spot = starts.GetStart(0u);
+					spot = starts.GetStart(0);
 			}
 		}
 
@@ -551,73 +551,66 @@ class Invasion : GameMode
     clearscope static int GetMainID()
     {
         let mode = Invasion(GameModeHandler.Get().GetMainGameMode());
-		return mode ? mode.GetID() : GameModeHandler.DEFAULT_ID;
-    }
-
-    clearscope static Invasion GetInvasion(int id)
-    {
-        return id == GameModeHandler.DEFAULT_ID
-                    ? Invasion(GameModeHandler.Get().GetMainGameMode())
-                    : Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
+		return mode ? mode.GetID() : GameModeHandler.INVALID_MODE;
     }
 
 	clearscope static int GetRemainingEnemies(int id)
 	{
-        let mode = GetInvasion(id);
+        let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.GetRemainingInvasionEnemies() : -1;
 	}
 	
 	clearscope static int GetWave(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.GetInvasionWave() : -1;
 	}
 	
 	clearscope static int GetTotalWaves(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.GetTotalInvasionWaves() : -1;
 	}
 
 	clearscope static int GetCountdownTimer(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.GetInvasionTimer() : -1;
 	}
 	
 	clearscope static int GetState(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.GetInvasionState() : IS_INVALID;
 	}
 	
 	clearscope static bool WaveStarted(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.InvasionWaveStarted() : false;
 	}
 	
 	clearscope static bool WaveEnded(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.InvasionWaveEnded() : false;
 	}
 	
 	clearscope static bool Started(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.InvasionStarted() : false;
 	}
 
     clearscope static bool Ended(int id)
     {
-        let mode = GetInvasion(id);
+        let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.invasionState == IS_ENDED || mode.invasionState == IS_IDLE : true;
     }
 	
 	clearscope static bool Paused(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.InvasionPaused() : false;
 	}
 
@@ -644,28 +637,28 @@ class Invasion : GameMode
 	
 	static void End(int id, bool kill = true)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
         if (mode)
             mode.EndInvasion(kill);
 	}
 	
 	static void Pause(int id, bool val)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
         if (mode)
             mode.PauseInvasion(val);
 	}
 	
 	static void StartWave(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
         if (mode)
             mode.StartInvasionWave();
 	}
 	
 	static void EndWave(int id)
 	{
-		let mode = GetInvasion(id);
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
         if (mode)
             mode.EndInvasionWave();
 	}

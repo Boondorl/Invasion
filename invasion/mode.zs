@@ -47,7 +47,6 @@ class GameMode play
 
 class GameModeHandler : EventHandler
 {
-	const DEFAULT_ID = 0;
 	const INVALID_MODE = -1;
 
 	private int mapSkill;
@@ -64,10 +63,23 @@ class GameModeHandler : EventHandler
 		return mapSkill;
 	}
 
-	GameMode AddGameMode(class<GameMode> type, int id = DEFAULT_ID, bool setMain = true)
+	GameMode AddGameMode(class<GameMode> type, int id, bool setMain = true)
 	{
 		if (!type)
 			return null;
+
+		if (id < 0)
+		{
+			Console.Printf("%sWarning: Negative ID %d is invalid. Game mode failed to create.", Font.TEXTCOLOR_YELLOW, id);
+			return null;
+		}
+
+		let existing = FindGameMode(id, type);
+		if (existing)
+		{
+			Console.Printf("%sWarning: ID %d of type %s already exists. Game mode failed to create.", Font.TEXTCOLOR_YELLOW, id, type.GetClassName());
+			return null;
+		}
 
 		let mode = GameMode(new(type));
 		mode.SetID(id);
@@ -100,8 +112,11 @@ class GameModeHandler : EventHandler
 		return mainMode == INVALID_MODE ? null : gameModes[mainMode];
 	}
 
-	clearscope GameMode, int FindGameMode(int id = DEFAULT_ID, class<GameMode> type = null) const
+	clearscope GameMode, int FindGameMode(int id, class<GameMode> type = null) const
 	{
+		if (id < 0)
+			return GetMainGameMode(), mainMode;
+
 		int i;
 		for (; i < gameModes.Size(); ++i)
 		{
