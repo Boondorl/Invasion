@@ -6,14 +6,14 @@ class FuturePlayerStarts
 	static FuturePlayerStarts Create(int wave)
 	{
 		let fps = new("FuturePlayerStarts");
-		fps.wave = wave;
+		fps.wave = Max(wave, 1);
 
 		return fps;
 	}
 
 	void AddStart(FuturePlayerStart start)
 	{
-        int num = start.Args[FuturePlayerStart.PLAY_NUM];
+        int num = start.Args[FuturePlayerStart.PLAY_NUM] - 1;
         if (num >= 0 && num < MAXPLAYERS)
             starts[num] = start;
 	}
@@ -179,12 +179,13 @@ class Invasion : GameMode
 			int i;
 			for (; i < playerStarts.Size(); ++i)
 			{
-				if (playerStarts[i].GetWave() > start.Args[FuturePlayerStart.START_WAVE])
+				if (playerStarts[i].GetWave() == start.Args[FuturePlayerStart.START_WAVE])
 				{
-					--i;
-					if (i < 0 || playerStarts[i].GetWave() < start.Args[FuturePlayerStart.START_WAVE])
-						playerStarts.Insert(++i, FuturePlayerStarts.Create(start.Args[FuturePlayerStart.START_WAVE]));
-
+					break;
+				}
+				else if (playerStarts[i].GetWave() > start.Args[FuturePlayerStart.START_WAVE])
+				{
+					playerStarts.Insert(i, FuturePlayerStarts.Create(start.Args[FuturePlayerStart.START_WAVE]));
 					break;
 				}
 			}

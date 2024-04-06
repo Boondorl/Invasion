@@ -165,19 +165,4 @@ class FuturePlayerStart : Actor
 
 		ChangeStatNum(DEFAULT_STAT);
 	}
-
-	override void PostBeginPlay()
-	{
-		Super.PostBeginPlay();
-
-		--Args[PLAY_NUM]; // Players are 0-indexed
-		if (Args[PLAY_NUM] < 0 || Args[PLAY_NUM] >= MAXPLAYERS)
-		{
-			Destroy();
-			return;
-		}
-
-		if (Args[START_WAVE] <= 0)
-			Args[START_WAVE] = 1;
-	}
 }
