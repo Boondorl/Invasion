@@ -532,10 +532,10 @@ class Invasion : GameMode
 
 			if (invasionState == IS_ACTIVE && healers > 0)
 			{
-				string heal = String.Format(StringTable.Localize("$IN_HEALERS"), healers);
-				x = int(w - BigFont.StringWidth(heal) * scale.X * 0.5);
-				Screen.DrawText(BigFont, -1, x, y, heal, DTA_ScaleX, scale.X, DTA_ScaleY, scale.Y);
-				y += height;
+				string heal = String.Format(healers == 1 ? StringTable.Localize("$IN_ONE_HEALER") : StringTable.Localize("$IN_HEALERS"), healers);
+				x = int(w - BigFont.StringWidth(heal) * scale.X * 0.375);
+				Screen.DrawText(BigFont, -1, x, y, heal, DTA_ScaleX, scale.X * 0.75, DTA_ScaleY, scale.Y * 0.75);
+				y += int(height * 0.75);
 			}
 			
 			if (invasionState == IS_COUNTDOWN && timer <= Seconds2Ticks(COUNTDOWN_TIME) && !bWaveFinished)
