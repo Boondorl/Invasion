@@ -1,0 +1,134 @@
+#library "invasion"
+#include "zcommon.acs"
+
+#libdefine INVASION_INVALID		-1
+#libdefine INVASION_IDLE		0
+#libdefine INVASION_ENDED		1
+#libdefine INVASION_COUNTDOWN	2
+#libdefine INVASION_ACTIVE		3
+#libdefine INVASION_VICTORY		4
+
+#libdefine DEFAULT_ID 0
+
+function int GetInvasionID(void)
+{
+	return ScriptCall("Invasion", "GetMainID");
+}
+
+function void SetMainInvasion(int id)
+{
+	ScriptCall("Invasion", "SetMainInvasion", id);
+}
+
+function bool IsMainInvasion(int id)
+{
+	return ScriptCall("Invasion", "IsMainInvasion", id);
+}
+
+function void StartInvasion(int id, int totalWaves, int waveDelay, int initialDelay, bool setMain)
+{
+	ScriptCall("Invasion", "Start", id, totalWaves, waveDelay, initialDelay, setMain);
+}
+
+function void EndInvasion(int id, bool killMonsters)
+{
+	ScriptCall("Invasion", "End", id, killMonsters);
+}
+
+function void PauseInvasion(int id, bool val)
+{
+	ScriptCall("Invasion", "Pause", id, val);
+}
+
+function bool InvasionPaused(int id)
+{
+	return ScriptCall("Invasion", "Paused", id);
+}
+
+function bool InvasionStarted(int id)
+{
+	return ScriptCall("Invasion", "Started", id);
+}
+
+function bool InvasionEnded(int id)
+{
+	return ScriptCall("Invasion", "Ended", id);
+}
+
+function int GetTotalWaves(int id)
+{
+	return ScriptCall("Invasion", "GetTotalWaves", id);
+}
+
+function int GetCountdown(int id)
+{
+	return ScriptCall("Invasion", "GetCountdownTimer", id);
+}
+
+function int GetState(int id)
+{
+	return ScriptCall("Invasion", "GetState", id);
+}
+
+function int GetWave(int id)
+{
+	return ScriptCall("Invasion", "GetWave", id);
+}
+
+function bool WaveStarted(int id)
+{
+	return ScriptCall("Invasion", "WaveStarted", id);
+}
+
+function bool WaveEnded(int id)
+{
+	return ScriptCall("Invasion", "WaveEnded", id);
+}
+
+function void StartWave(int id)
+{
+	ScriptCall("Invasion", "StartWave", id);
+}
+
+function void EndWave(int id)
+{
+	ScriptCall("Invasion", "EndWave", id);
+}
+
+function int GetRemainingEnemies(int id)
+{
+	return ScriptCall("Invasion", "GetRemainingEnemies", id);
+}
+
+function void PauseSpawners(int tid, bool val)
+{
+	ScriptCall("Invasion", "PauseSpawners", tid, val);
+}
+
+function void SetCallback(int id)
+{
+	ACS_NamedExecuteAlways("SetCallbackFunction", 0, id, 0, 0);
+}
+
+function void SetCallbackNamed(str id)
+{
+	ScriptCall("Invasion", "SetCallback", id);
+}
+
+int callBack = 0;
+script "ExecuteCallbackFunction" (void)
+{
+	if (!callBack)
+	{
+		Thing_Remove(0);
+		terminate;
+	}
+	
+	if (ACS_ExecuteWithResult(callBack, 0, 0, 0, 0))
+		Thing_Remove(0);
+}
+
+script "SetCallbackFunction" (int id)
+{
+	callBack = id;
+}

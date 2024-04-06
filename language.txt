@@ -2,7 +2,7 @@
 
 IN_DEFEATED = "Wave defeated!";
 IN_PREPARE = "Prepare for battle!";
-IN_COUNTDOWN = "Next wave in %d seconds";
+IN_COUNTDOWN = "Next wave in %.0f seconds";
 IN_WAVE = "Wave %d of %d";
 IN_ENDLESS = "Wave %d";
 IN_ONE_REMAINING = "%d enemy remaining";

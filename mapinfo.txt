@@ -1,6 +1,6 @@
 GameInfo
 {
-	AddEventHandlers = "Invasion"
+	AddEventHandlers = "GameModeHandler"
 }
 
 DoomEdNums

@@ -1,7 +1,7 @@
-const STAT_IDLE_PUSHER = Thinker.STAT_STATIC + 3;
-
 class MonsterPusher : Actor
 {
+	const IDLE_STAT = Thinker.STAT_STATIC + 3;
+
 	enum EPusherArgs
 	{
 		SEC_TAG,
@@ -35,48 +35,60 @@ class MonsterPusher : Actor
 		+DONTBLAST
 	}
 
+	override void BeginPlay()
+	{
+		ChangeStatNum(STAT_FIRST_THINKING);
+		Super.BeginPlay();
+	}
+
 	override void PostBeginPlay()
 	{
-		super.PostBeginPlay();
+		Super.PostBeginPlay();
 
-		if (args[SEC_TAG])
+		if (Args[SEC_TAG])
 		{
 			int secID;
-			let it = level.CreateSectorTagIterator(args[SEC_TAG]);
+			let it = Level.CreateSectorTagIterator(Args[SEC_TAG]);
 			while ((secID = it.Next()) >= 0)
-				sectors.Push(level.sectors[secID]);
+				sectors.Push(Level.Sectors[secID]);
 		}
 	}
 	
 	override void Activate(Actor activator)
 	{
+		if (!bDormant)
+			return;
+
 		bDormant = false;
 		ChangeStatNum(STAT_FIRST_THINKING);
 	}
 	
 	override void Deactivate(Actor deactivator)
 	{
+		if (bDormant)
+			return;
+
 		bDormant = true;
-		ChangeStatNum(STAT_IDLE_PUSHER);
+		ChangeStatNum(IDLE_STAT);
 	}
 	
 	override void Tick()
 	{
-		if ((freezeTics > 0u && --freezeTics >= 0u) || !args[PUSH_POW] || IsFrozen())
+		if ((FreezeTics > 0u && --FreezeTics >= 0u) || !Args[PUSH_POW] || IsFrozen())
 			return;
 		
-		double power = abs(args[PUSH_POW]);
-		Vector2 dir = angle.ToVector();
-		if (args[PUSH_POW] < 0)
+		double power = Abs(Args[PUSH_POW]);
+		Vector2 dir = Angle.ToVector();
+		if (Args[PUSH_POW] < 0)
 			dir = -dir;
 
-		if (args[PUSH_RAD] > 0)
+		if (Args[PUSH_RAD] > 0)
 		{
-			double radSq = args[PUSH_RAD] * args[PUSH_RAD];
-			let it = BlockThingsIterator.Create(self, args[PUSH_RAD]);
+			double radSq = Args[PUSH_RAD] * Args[PUSH_RAD];
+			let it = BlockThingsIterator.Create(self, Args[PUSH_RAD]);
 			while (it.Next())
 			{
-				Actor mo = it.thing;
+				Actor mo = it.Thing;
 				if (mo && mo.bIsMonster && !mo.bDormant && !mo.IsFrozen() && Distance2DSquared(mo) <= radSq)
 					PushMonster(mo, dir, power);
 			}
@@ -94,28 +106,28 @@ class MonsterPusher : Actor
 	
 	protected void PushMonstersInSector(Sector sec, Vector2 dir, double power)
 	{
-		Actor cur = sec.thingList;
+		Actor cur = sec.ThingList;
 		while (cur)
 		{
 			if (cur.bIsMonster && !cur.bDormant && !cur.IsFrozen())
 				PushMonster(cur, dir, power);
 			
-			cur = cur.sNext;
+			cur = cur.SNext;
 		}
 	}
 
 	protected void PushMonster(Actor mo, Vector2 dir, double power)
 	{
-		double diff = mo.vel.xy dot dir;
+		double diff = mo.Vel.XY dot dir;
 		if (diff < power)
-			mo.vel.xy += dir * min(power, power-diff);
+			mo.Vel.XY += dir * Min(power, power-diff);
 	}
 }
 
-const STAT_FUTURE_PLAYER_START = Thinker.STAT_STATIC + 1;
-
 class FuturePlayerStart : Actor
 {
+	const DEFAULT_STAT = Thinker.STAT_STATIC + 1;
+
 	enum EFuturePlayerArgs
 	{
 		PLAY_NUM,
@@ -149,23 +161,23 @@ class FuturePlayerStart : Actor
 
 	override void BeginPlay()
 	{
-		super.BeginPlay();
+		Super.BeginPlay();
 
-		ChangeStatNum(STAT_FUTURE_PLAYER_START);
+		ChangeStatNum(DEFAULT_STAT);
 	}
 
 	override void PostBeginPlay()
 	{
-		super.PostBeginPlay();
+		Super.PostBeginPlay();
 
-		--args[PLAY_NUM]; // Players are 0-indexed
-		if (args[PLAY_NUM] < 0 || args[PLAY_NUM] >= MAXPLAYERS)
+		--Args[PLAY_NUM]; // Players are 0-indexed
+		if (Args[PLAY_NUM] < 0 || Args[PLAY_NUM] >= MAXPLAYERS)
 		{
 			Destroy();
 			return;
 		}
 
-		if (args[START_WAVE] <= 0)
-			args[START_WAVE] = 1;
+		if (Args[START_WAVE] <= 0)
+			Args[START_WAVE] = 1;
 	}
 }

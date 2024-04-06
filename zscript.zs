@@ -2,6 +2,7 @@ version "4.11"
 
 // Base
 #include "invasion/mode.zs"
+#include "invasion/invasion.zs"
 #include "invasion/spawner.zs"
 #include "invasion/map.zs"
 
