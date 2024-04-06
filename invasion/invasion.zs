@@ -164,6 +164,10 @@ class Invasion : GameMode
 			if (s.user_InvasionID == GetID())
 			{
 				spawners.Push(s);
+				if (s is "GenericSpawner")
+					GenericSpawner(s).Initialize();
+					
+				s.Reset(true, true);
 				s.ActivateSpawner(s.ShouldActivate(wave), self);
 			}
 		}	

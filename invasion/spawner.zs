@@ -119,13 +119,6 @@ class InvasionSpawner : Actor abstract
 			di = di.Next;
 		}
 
-		if (!spawnTypes.Size())
-		{
-			Destroy();
-			return;
-		}
-
-		Reset(true, true);
 		ChangeStatNum(DEFAULT_STAT);
 
 		Super.BeginPlay();
@@ -355,7 +348,7 @@ class InvasionSpawner : Actor abstract
 	
 	clearscope int GetSpawnDelay() const
 	{
-		return user_InitialSpawnDelay < 0 ? Args[SPAWN_DELAY] : user_InitialSpawnDelay;
+		return user_InitialSpawnDelay < 0 ? Args[SPAWN_DELAY] * Abs(user_InitialSpawnDelay) : user_InitialSpawnDelay;
 	}
 	
 	clearscope bool ShouldActivate(int wave) const
@@ -422,6 +415,8 @@ class InvasionSpawner : Actor abstract
 
 class GenericSpawner : InvasionSpawner
 {
+	private bool bInitialized;
+
 	Default
 	{
 		//$Category Invasion
@@ -430,10 +425,12 @@ class GenericSpawner : InvasionSpawner
 
 	string user_ClassName;
 
-	override void PostBeginPlay()
+	void Initialize()
 	{
-		Super.PostBeginPlay();
+		if (bInitialized)
+			return;
 
+		bInitialized = true;
 		class<Actor> type = user_ClassName;
 		if (type)
 			AddSpawnType(type, 1);
