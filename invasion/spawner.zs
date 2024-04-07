@@ -173,7 +173,7 @@ class InvasionSpawner : Actor abstract
 	protected void AddSpawnType(class<Actor> type, int probability)
 	{
 		let def = GetDefaultByType(type);
-		bDontCount |= !def.bIsMonster;
+		bDontCount |= !def.bIsMonster || def.bFriendly;
 
 		probability = Max(1, probability);
 		spawnTypes.Push(InvasionType.Create(type, probability));
@@ -239,9 +239,12 @@ class InvasionSpawner : Actor abstract
 		if (!mo)
 			return;
 
-		mode.AddWaveMonster(mo);
 		mo.bNeverRespawn = true;
-		if (mo.bIsMonster && !(Args[FLAGS] & FL_NO_TARGET))
+		if (bFriendly && mo.bIsMonster)
+			mo.bFriendly = true;
+
+		mode.AddWaveMonster(mo);
+		if (mo.bIsMonster && !mo.bFriendly && !(Args[FLAGS] & FL_NO_TARGET))
 		{
 			Actor nearest = GetNearestPlayer();
 			if (nearest)
@@ -385,7 +388,7 @@ class InvasionSpawner : Actor abstract
 
 	clearscope bool CountMonster() const
 	{
-		return !bDontCount;
+		return !bFriendly && !bDontCount;
 	}
 
 	void Reset(bool time, bool limit)
