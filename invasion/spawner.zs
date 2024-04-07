@@ -241,7 +241,10 @@ class InvasionSpawner : Actor abstract
 
 		mo.bNeverRespawn = true;
 		if (bFriendly && mo.bIsMonster)
+		{
+			mo.ClearCounters();
 			mo.bFriendly = true;
+		}
 
 		mode.AddWaveMonster(mo);
 		if (mo.bIsMonster && !mo.bFriendly && !(Args[FLAGS] & FL_NO_TARGET))
