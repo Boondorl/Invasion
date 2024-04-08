@@ -116,6 +116,11 @@ function void UncountMonsters(int id, int tid)
 	ScriptCall("Invasion", "RemoveMonsters", id, tid);
 }
 
+function void SetObjective(int id, str objective)
+{
+	ScriptCall("Invasion", "StartObjective", id, objective);
+}
+
 function void SetCallback(int id)
 {
 	ACS_NamedExecuteAlways("SetCallbackFunction", 0, id, 0, 0);

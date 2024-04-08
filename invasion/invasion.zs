@@ -51,6 +51,7 @@ class Invasion : GameMode
 	private int totalWaves;
 	private int waveTimer;
 	private EInvasionState invasionState;
+	private string objective;
 	
 	// Wave info
 	private int enemies, healers;
@@ -151,6 +152,11 @@ class Invasion : GameMode
 		return bPaused;
 	}
 
+	clearscope string GetObjective() const
+	{
+		return StringTable.Localize(objective);
+	}
+
     void StartInvasion(int wTotal, double wTimer, double initialTimer)
 	{
 		if (bStarted)
@@ -236,6 +242,7 @@ class Invasion : GameMode
 		timer = 0;
 		invasionState = IS_ACTIVE;
 		bWaveStarted = true;
+		objective = "";
 		UpdateMonsterCount();
 	}
 	
@@ -584,6 +591,11 @@ class Invasion : GameMode
 		else if (!multiplayer)
 			mo.Teleport(mo.Pos, mo.Angle, TF_TELEFRAG|TF_NOSRCFOG|TF_OVERRIDE);
 	}
+
+	void SetObjective(string obj)
+	{
+		objective = obj;
+	}
 	
 	override void Draw(RenderEvent e)
 	{
@@ -602,9 +614,18 @@ class Invasion : GameMode
 			Screen.DrawText(BigFont, -1, x, y, waveCount, DTA_ScaleX, scale.X, DTA_ScaleY, scale.Y);
 			y += height;
 		}
+
+		if (invasionState == IS_ACTIVE && objective.Length())
+		{
+			string obj = GetObjective();
+			x = int(w - BigFont.StringWidth(obj) * scale.X * 0.5);
+			Screen.DrawText(BigFont, -1, x, y, obj, DTA_ScaleX, scale.X, DTA_ScaleY, scale.Y);
+			y += height;
+		}
 		
 		if (!bPaused || (invasionState == IS_ACTIVE && enemies > 0))
 		{
+			Vector2 textScale = (1.0, 1.0);
 			string text;
 			switch (invasionState)
 			{
@@ -618,18 +639,15 @@ class Invasion : GameMode
 					break;
 					
 				case IS_ACTIVE:
-					if (enemies == 1)
-					{
-						text = String.Format(StringTable.Localize("$IN_ONE_REMAINING"), enemies);
-					}
-					else if (enemies <= 0)
+					if (enemies <= 0)
 					{
 						if (totalWaves <= 0 || wave < totalWaves)
 							text = StringTable.Localize("$IN_DEFEATED");
 					}
 					else
 					{
-						text = String.Format(StringTable.Localize("$IN_REMAINING"), enemies);
+						textScale = (0.75, 0.75);
+						text = String.Format(enemies == 1 ? StringTable.Localize("$IN_ONE_REMAINING") : StringTable.Localize("$IN_REMAINING"), enemies);
 					}
 					break;
 					
@@ -642,9 +660,9 @@ class Invasion : GameMode
 					break;
 			}
 			
-			x = int(w - BigFont.StringWidth(text) * scale.X * 0.5);
-			Screen.DrawText(BigFont, -1, x, y, text, DTA_ScaleX, scale.X, DTA_ScaleY, scale.Y);
-			y += height;
+			x = int(w - BigFont.StringWidth(text) * scale.X * 0.5 * textScale.X);
+			Screen.DrawText(BigFont, -1, x, y, text, DTA_ScaleX, scale.X * textScale.X, DTA_ScaleY, scale.Y * textScale.Y);
+			y += int(height * textScale.Y);
 
 			if (invasionState == IS_ACTIVE && healers > 0)
 			{
@@ -792,6 +810,13 @@ class Invasion : GameMode
 		InvasionSpawner spawner;
 		while (spawner = InvasionSpawner(it.Next()))
 			spawner.Pause(val);
+	}
+
+	static void StartObjective(int id, string obj)
+	{
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
+		if (mode)
+			mode.SetObjective(obj);
 	}
 
 	static void AddMonsters(int id, int tid)
