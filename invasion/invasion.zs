@@ -31,6 +31,7 @@ class FuturePlayerStarts
 
 class Invasion : GameMode
 {
+	const DEFAULT_WAVE_TIME = 10.0;
     const COUNTDOWN_TIME = 5.0;
 	const VICTORY_TIME = 3.0;
 
@@ -161,11 +162,14 @@ class Invasion : GameMode
 	{
 		if (bStarted)
 			return;
+
+		if (wTimer < 0.0)
+			wTimer = DEFAULT_WAVE_TIME;
 		
 		bStarted = true;
 		invasionState = IS_COUNTDOWN;
 		wave = 1;
-		totalWaves = wTotal;
+		totalWaves = Max(wTotal, 0);
 		waveTimer = Seconds2Ticks(wTimer);
 
 		// Cache spawners local to the invasion.
@@ -211,6 +215,9 @@ class Invasion : GameMode
 
 			playerStarts[i].AddStart(start);
 		}
+
+		if (initialTimer < 0.0)
+			initialTimer = wTimer;
 
 		timer = Seconds2Ticks(initialTimer);
         if (timer <= 0)
