@@ -69,6 +69,9 @@ class Invasion : GameMode
     {
         foreach (s : spawners)
         {
+			if (!s)
+				continue;
+
             s.ActivateSpawner(false, null);
             s.Reset(true, true);
             s.Pause(false);
@@ -521,8 +524,8 @@ class Invasion : GameMode
 
 	override void ThingSpawned(WorldEvent e)
 	{
-		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE && trackingTIDs.CheckKey(e.Thing.TID))
-			AddMonsterToCount(e.Thing);
+		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE && trackingTIDs.CheckKey(e.Thing.TID) && AddMonsterToCount(e.Thing))
+			TIDTracked.Push(e.Thing);
 	}
 	
 	override void ThingRevived(WorldEvent e)
