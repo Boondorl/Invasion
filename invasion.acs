@@ -106,6 +106,16 @@ function void PauseSpawners(int tid, bool val)
 	ScriptCall("Invasion", "PauseSpawners", tid, val);
 }
 
+function void CountMonsters(int id, int tid)
+{
+	ScriptCall("Invasion", "AddMonsters", id, tid);
+}
+
+function void UncountMonsters(int id, int tid)
+{
+	ScriptCall("Invasion", "RemoveMonsters", id, tid);
+}
+
 function void SetCallback(int id)
 {
 	ACS_NamedExecuteAlways("SetCallbackFunction", 0, id, 0, 0);

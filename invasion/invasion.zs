@@ -60,7 +60,10 @@ class Invasion : GameMode
 
 	private Array<FuturePlayerStarts> playerStarts;
 	private Array<InvasionSpawner> spawners;
-	private Array<Actor> waveMonsters;
+	private Array<Actor> waveMonsters, countedMonsters;
+
+	private Map<int, bool> trackingTIDs;
+	private Array<Actor> TIDTracked; // For monsters being tracked solely by their TID.
 
     override void OnDestroy()
     {
@@ -252,33 +255,83 @@ class Invasion : GameMode
 		ClearMonsters();
 	}
 
+	void TrackTID(int tid)
+	{
+		if (!tid || trackingTIDs.CheckKey(tid))
+			return;
+
+		trackingTIDs.Insert(tid, true);
+
+		Actor mo;
+		let it = Level.CreateActorIterator(tid);
+		while (mo = it.Next())
+		{
+			if (AddMonsterToCount(mo))
+				TIDTracked.Push(mo);
+		}
+	}
+
+	void ClearTrackingTID(int tid = 0)
+	{
+		Array<int> toRemove;
+		if (!tid)
+		{
+			MapIterator<int, bool> mit;
+			mit.Init(trackingTIDs);
+			while (mit.Next())
+				toRemove.Push(mit.GetKey());
+
+			trackingTIDs.Clear();
+		}
+		else if (trackingTIDs.CheckKey(tid))
+		{
+			toRemove.Push(tid);
+			trackingTIDs.Remove(tid);
+		}
+
+		if (!toRemove.Size())
+			return;
+
+		for(int i = TIDTracked.Size() - 1; i >= 0; --i)
+		{
+			if (toRemove.Find(TIDTracked[i].TID) < toRemove.Size())
+			{
+				RemoveMonsterFromCount(TIDTracked[i]);
+				TIDTracked.Delete(i);
+			}
+		}
+	}
+
     override void Tick()
     {
         bWaveStarted = bWaveFinished = false;
-		if (!bStarted || bPaused)
+		if (!bStarted)
 			return;
 		
-		switch (invasionState)
+		if (!bPaused)
 		{
-			case IS_VICTORY:
-				DoVictory();
-				break;
+			switch (invasionState)
+			{
+				case IS_VICTORY:
+					DoVictory();
+					break;
+					
+				case IS_COUNTDOWN:
+					DoCountdown();
+					break;
 				
-			case IS_COUNTDOWN:
-				DoCountdown();
-				break;
-			
-			case IS_ACTIVE:
-				DoActive();
-				break;
+				case IS_ACTIVE:
+					DoActive();
+					break;
 
-			case IS_ENDED:
-				DoEnd();
-				break;
+				case IS_ENDED:
+					DoEnd();
+					break;
+			}
+
+			if (bDestroyed)
+				return;
 		}
-
-        if (bDestroyed)
-            return;
 
         foreach (s : spawners)
         {
@@ -296,8 +349,12 @@ class Invasion : GameMode
 		bWaveFinished = true;
 		++wave;
 		invasionState = IS_COUNTDOWN;
+
 		RemoveCorpses();
         waveMonsters.Clear();
+		countedMonsters.Clear();
+		TIDTracked.Clear();
+
         ActivateSpawners();
 	}
 	
@@ -392,52 +449,108 @@ class Invasion : GameMode
 		}
     }
 
-    void AddWaveMonster(Actor mo)
-    {
-        if (!mo || !mo.bIsMonster || mo.bFriendly || waveMonsters.Find(mo) < waveMonsters.Size())
+	bool AddMonsterToCount(Actor mo)
+	{
+		if (invasionState != IS_ACTIVE || !mo || !mo.bIsMonster || mo.bFriendly
+			|| waveMonsters.Find(mo) >= waveMonsters.Size() || countedMonsters.Find(mo) < countedMonsters.Size())
+		{
+            return false;
+		}
+
+		countedMonsters.Push(mo);
+		if (!mo.bKilled)
+			++enemies;
+
+		return true;
+	}
+
+	void RemoveMonsterFromCount(Actor mo)
+	{
+		if (invasionState != IS_ACTIVE || !mo || !mo.bIsMonster || mo.bFriendly)
             return;
 
+		int index = countedMonsters.Find(mo);
+		if (index >= countedMonsters.Size())
+			return;
+
+		countedMonsters.Delete(index);
+		if (!mo.bKilled)
+			--enemies;
+	}
+
+    bool AddWaveMonster(Actor mo, bool counted)
+    {
+        if (invasionState != IS_ACTIVE || !mo || !mo.bIsMonster || mo.bFriendly || waveMonsters.Find(mo) < waveMonsters.Size())
+            return false;
+
         waveMonsters.Push(mo);
-        if (mo.FindState("Heal"))
-            ++healers;
+		if (counted)
+			countedMonsters.Push(mo);
+		if (!mo.bKilled && mo.FindState("Heal"))
+			++healers;
+
+		return true;
     }
+
+	void RemoveWaveMonster(Actor mo)
+	{
+		if (invasionState != IS_ACTIVE || !mo || !mo.bIsMonster || mo.bFriendly)
+            return;
+
+		int index = waveMonsters.Find(mo);
+		if (index >= waveMonsters.Size())
+			return;
+
+		waveMonsters.Delete(index);
+
+		index = countedMonsters.Find(mo);
+		if (index < countedMonsters.Size())
+		{
+			countedMonsters.Delete(index);
+			if (!mo.bKilled)
+				--enemies;
+		}
+
+		index = TIDTracked.Find(mo);
+		if (index < TIDTracked.Size())
+			TIDTracked.Delete(index);
+
+		if (!mo.bKilled && mo.FindState("Heal"))
+			--healers;
+	}
+
+	override void ThingSpawned(WorldEvent e)
+	{
+		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE && trackingTIDs.CheckKey(e.Thing.TID))
+			AddMonsterToCount(e.Thing);
+	}
 	
 	override void ThingRevived(WorldEvent e)
 	{
-		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE && waveMonsters.Find(e.Thing) < waveMonsters.Size())
+		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE)
 		{
-			++enemies;
-			if (e.Thing.FindState("Heal"))
+			if (countedMonsters.Find(e.Thing) < countedMonsters.Size())
+				++enemies;
+			if (e.Thing.FindState("Heal") && waveMonsters.Find(e.Thing) < waveMonsters.Size())
 				++healers;
 		}
 	}
 	
 	override void ThingDied(WorldEvent e)
 	{
-		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE && waveMonsters.Find(e.Thing) < waveMonsters.Size())
+		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE)
 		{
-			--enemies;
-			if (e.Thing.FindState("Heal"))
+			if (countedMonsters.Find(e.Thing) < countedMonsters.Size())
+				--enemies;
+			if (e.Thing.FindState("Heal") && waveMonsters.Find(e.Thing) < waveMonsters.Size())
 				--healers;
 		}
 	}
 	
 	override void ThingDestroyed(WorldEvent e)
 	{
-		if (!e.Thing || !e.Thing.bIsMonster || invasionState != IS_ACTIVE)
-			return;
-
-		int i = waveMonsters.Find(e.Thing);
-		if (i < waveMonsters.Size())
-		{
-			waveMonsters.Delete(i);
-			if (!e.Thing.bKilled)
-			{
-				--enemies;
-				if (e.Thing.FindState("Heal"))
-					--healers;
-			}
-		}
+		if (e.Thing && e.Thing.bIsMonster && invasionState == IS_ACTIVE)
+			RemoveWaveMonster(e.Thing);
 	}
 
     override void PlayerRespawned(PlayerEvent e)
@@ -676,6 +789,20 @@ class Invasion : GameMode
 		InvasionSpawner spawner;
 		while (spawner = InvasionSpawner(it.Next()))
 			spawner.Pause(val);
+	}
+
+	static void AddMonsters(int id, int tid)
+	{
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
+		if (mode)
+			mode.TrackTID(tid);
+	}
+
+	static void RemoveMonsters(int id, int tid = 0)
+	{
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
+		if (mode)
+			mode.ClearTrackingTID(tid);
 	}
 
 	static void SetCallback(Name callback)

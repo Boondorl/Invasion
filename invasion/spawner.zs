@@ -246,7 +246,7 @@ class InvasionSpawner : Actor abstract
 			mo.bFriendly = true;
 		}
 
-		mode.AddWaveMonster(mo);
+		mode.AddWaveMonster(mo, CountMonster() && spawnLimit > 0);
 		if (mo.bIsMonster && !mo.bFriendly && !(Args[FLAGS] & FL_NO_TARGET))
 		{
 			Actor nearest = GetNearestPlayer();
