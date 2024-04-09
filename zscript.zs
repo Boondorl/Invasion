@@ -25,7 +25,10 @@ version "4.11"
 #include "invasion/spawners/heretic/powerupspawner.zs"
 
 // Hexen wrappers
-
+#include "invasion/spawners/hexen/monsterspawner.zs"
+#include "invasion/spawners/hexen/weaponspawner.zs"
+#include "invasion/spawners/hexen/healthspawner.zs"
+#include "invasion/spawners/hexen/itemspawner.zs"
 
 // Strife wrappers
 

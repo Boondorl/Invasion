@@ -135,4 +135,62 @@ DoomEdNums
 	
 	23504 = SilverShieldSpawner
 	23505 = EnchantedShieldSpawner
+	
+	// Hexen
+	23506 = FireDemonSpawner
+	23507 = EttinSpawner
+	23508 = BishopSpawner
+	23509 = CentunarSpawner
+	23510 = CentaurLeaderSpawner
+	23511 = SerpentSpawner
+	23512 = SerpentLeaderSpawner
+	23513 = Demon1Spawner
+	23514 = Demon2Spawner
+	23515 = IceGuySpawner
+	23516 = WraithSpawner
+	23517 = HeresiarchSpawner
+	23518 = DragonSpawner
+	23519 = KoraxSpawner
+	23520 = ClericBossSpawner
+	23521 = FighterBossSpawner
+	23522 = MageBossSpawner
+	
+	23523 = CWeapStaffSpawner
+	23524 = CWeapFlameSpawner
+	23525 = CWeaponPiece1Spawner
+	23526 = CWeaponPiece2Spawner
+	23527 = CWeaponPiece3Spawner
+	23528 = FWeapAxeSpawner
+	23529 = FWeapHammerSpawner
+	23530 = FWeaponPiece1Spawner
+	23531 = FWeaponPiece2Spawner
+	23532 = FWeaponPiece3Spawner
+	23533 = MWeapFrostSpawner
+	23534 = MWeapLightningSpawner
+	23535 = MWeaponPiece1Spawner
+	23536 = MWeaponPiece2Spawner
+	23537 = MWeaponPiece3Spawner
+	
+	23538 = Mana1Spawner
+	23539 = Mana2Spawner
+	23540 = Mana3Spawner
+	
+	23541 = ArtiBlastRadiusSpawner
+	23542 = ArtiBoostArmorSpawner
+	23543 = ArtiPoisonBagSpawner
+	23544 = ArtiHealingRadiusSpawner
+	23545 = ArtiSpeedBootsSpawner
+	23546 = ArtiTeleportOtherSpawner
+	23547 = ArtiBoostManaSpawner
+	23548 = ArtiDarkServantSpawner
+	23549 = ArtiPorkSpawner
+	23550 = ArtiInvulnerability2Spawner
+	
+	23551 = MeshArmorSpawner
+	23552 = FalconShieldSpawner
+	23553 = PlatinumHelmSpawner
+	23554 = AmuletOfWardingSpawner
+	
+	// Strife
+	
 }
