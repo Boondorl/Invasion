@@ -5,9 +5,12 @@ GameInfo
 
 DoomEdNums
 {
+	// General
 	23397 = GenericSpawner
 	23398 = FuturePlayerStart
 	23399 = MonsterPusher
+	
+	// Doom
 	23400 = PossessedSpawner
 	23401 = LightMonsterSpawner
 	23402 = HeavyMonsterSpawner
@@ -70,4 +73,66 @@ DoomEdNums
 	23452 = ArmorBonusSpawner
 	23453 = GreenArmorSpawner
 	23454 = BlueArmorSpawner
+	
+	// Raven
+	23455 = MinotaurSpawner
+	
+	23456 = ArtiHealthSpawner
+	23457 = ArtiSuperHealthSpawner
+	23458 = ArtiFlySpawner
+	23459 = ArtiTorchSpawner
+	23460 = ArtiTeleportSpawner
+	
+	23461 = CrystalVialSpawner
+	
+	// Heretic
+	23462 = HereticImpSpawner
+	23463 = HereticImpLeaderSpawner
+	23464 = MummySpawner
+	23465 = MummyGhostSpawner
+	23466 = MummyLeaderSpawner
+	23467 = MummyLeaderGhostSpawner
+	23468 = KnightSpawner
+	23469 = KnightGhostSpawner
+	23470 = ClinkSpawner
+	23471 = WizardSpawner
+	23472 = BeastSpawner
+	23473 = SnakeSpawner
+	23474 = IronLichSpawner
+	23475 = Sorcerer1Spawner
+	23476 = Sorcerer2Spawner
+	23477 = ChickenSpawner
+	
+	23478 = GauntletsSpawner
+	23479 = GoldWandSpawner
+	23480 = CrossbowSpawner
+	23481 = BlasterSpawner
+	23482 = SkullRodSpawner
+	23483 = PhoenixRodSpawner
+	23484 = MaceWeaponSpawner
+	
+	23485 = BagOfHoldingSpawner
+	23486 = GoldWandAmmoSpawner
+	23487 = GoldWandHeftySpawner
+	23488 = CrossbowAmmoSpawner
+	23489 = CrossbowHeftySpawner
+	23490 = BlasterAmmoSpawner
+	23491 = BlasterHeftySpawner
+	23492 = SkullRodAmmoSpawner
+	23493 = SkullRodHeftySpawner
+	23494 = PhoenixRodAmmoSpawner
+	23495 = PhoenixRodHeftySpawner
+	23496 = MaceAmmoSpawner
+	23497 = MaceHeftySpawner
+	
+	23498 = SuperMapSpawner
+	
+	23499 = ArtiInvulnerabilitySpawner
+	23500 = ArtiEggSpawner
+	23501 = ArtiInvisibilitySpawner
+	23502 = ArtiTomeOfPowerSpawner
+	23503 = ArtiTimebombSpawner
+	
+	23504 = SilverShieldSpawner
+	23505 = EnchantedShieldSpawner
 }

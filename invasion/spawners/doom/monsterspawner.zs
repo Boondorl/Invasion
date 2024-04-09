@@ -2,7 +2,7 @@ class PossessedSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters/Random
+		//$Category Invasion/Doom/Monsters/Random
 		//$Title Random Zombie
 		//$Sprite POSSA1
 		DropItem "ZombieMan";
@@ -17,7 +17,7 @@ class LightMonsterSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters/Random
+		//$Category Invasion/Doom/Monsters/Random
 		//$Title Random Small Demon
 		//$Sprite TROOA1
 		DropItem "DoomImp";
@@ -33,7 +33,7 @@ class HeavyMonsterSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters/Random
+		//$Category Invasion/Doom/Monsters/Random
 		//$Title Random Large Demon
 		//$Sprite BOS2A1C1
 		DropItem "Arachnotron";
@@ -52,7 +52,7 @@ class BossSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters/Random
+		//$Category Invasion/Doom/Monsters/Random
 		//$Title Random Boss
 		//$Sprite CYBRA1
 		DropItem "Cyberdemon";
@@ -66,7 +66,7 @@ class GruntSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Grunt Spawner
 		//$Sprite POSSA1
 		DropItem "ZombieMan";
@@ -79,7 +79,7 @@ class SergeantSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Sergeant Spawner
 		//$Sprite SPOSA1
 		DropItem "ShotgunGuy";
@@ -92,7 +92,7 @@ class CommandoSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Commando Spawner
 		//$Sprite CPOSA1
 		DropItem "ChaingunGuy";
@@ -105,7 +105,7 @@ class ImpSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Imp Spawner
 		//$Sprite TROOA1
 		DropItem "DoomImp";
@@ -118,7 +118,7 @@ class DemonSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Pinkie Spawner
 		//$Sprite SARGA1
 		DropItem "Demon";
@@ -131,12 +131,14 @@ class SpectreSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Spectre Spawner
 		//$Sprite SARGA1
 		DropItem "Spectre";
 		Radius 30;
 		Height 56;
+		RenderStyle "Translucent";
+		Alpha 0.5;
 	}
 }
 
@@ -144,12 +146,13 @@ class LostSoulSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Lost Soul Spawner
 		//$Sprite SKULA1
 		DropItem "LostSoul";
 		Radius 16;
 		Height 56;
+		RenderStyle "SoulTrans";
 	}
 }
 
@@ -157,7 +160,7 @@ class CacodemonSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Cacodemon Spawner
 		//$Sprite HEADA1
 		DropItem "Cacodemon";
@@ -170,7 +173,7 @@ class PainElementalSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Pain Elemental Spawner
 		//$Sprite PAINA1
 		DropItem "PainElemental";
@@ -183,7 +186,7 @@ class RevenantSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Revenant Spawner
 		//$Sprite SKELA1D1
 		DropItem "Revenant";
@@ -196,7 +199,7 @@ class HellKnightSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Hell Knight Spawner
 		//$Sprite BOS2A1C1
 		DropItem "HellKnight";
@@ -209,7 +212,7 @@ class BaronSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Baron of Hell Spawner
 		//$Sprite BOSSA1
 		DropItem "BaronofHell";
@@ -222,7 +225,7 @@ class FatsoSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Mancubus Spawner
 		//$Sprite FATTA1
 		DropItem "Fatso";
@@ -235,7 +238,7 @@ class ArachnotronSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Arachnotron Spawner
 		//$Sprite BSPIA1D1
 		DropItem "Arachnotron";
@@ -249,7 +252,7 @@ class ArchvileSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Arch-vile Spawner
 		//$Sprite VILEA1D1
 		DropItem "Archvile";
@@ -262,7 +265,7 @@ class CyberdemonSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Cyberdemon Spawner
 		//$Sprite CYBRA1
 		DropItem "Cyberdemon";
@@ -275,7 +278,7 @@ class MastermindSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Monsters
+		//$Category Invasion/Doom/Monsters
 		//$Title Spider Mastermind Spawner
 		//$Sprite SPIDA1D1
 		DropItem "SpiderMastermind";

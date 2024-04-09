@@ -2,7 +2,7 @@ class HealthBonusSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Health
+		//$Category Invasion/Doom/Health
 		//$Title Health Bonus Spawner
 		//$Sprite BON1A0
 		DropItem "HealthBonus";
@@ -15,7 +15,7 @@ class StimpackSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Health
+		//$Category Invasion/Doom/Health
 		//$Title Stimpack Spawner
 		//$Sprite STIMA0
 		DropItem "Stimpack";
@@ -28,7 +28,7 @@ class MedikitSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Health
+		//$Category Invasion/Doom/Health
 		//$Title Medikit Spawner
 		//$Sprite MEDIA0
 		DropItem "Medikit";
@@ -41,7 +41,7 @@ class ArmorBonusSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Armor
+		//$Category Invasion/Doom/Armor
 		//$Title Armor Bonus Spawner
 		//$Sprite BON2A0
 		DropItem "ArmorBonus";
@@ -54,7 +54,7 @@ class GreenArmorSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Armor
+		//$Category Invasion/Doom/Armor
 		//$Title Green Armor Spawner
 		//$Sprite ARM1A0
 		DropItem "GreenArmor";
@@ -67,7 +67,7 @@ class BlueArmorSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Armor
+		//$Category Invasion/Doom/Armor
 		//$Title Blue Armor Spawner
 		//$Sprite ARM2A0
 		DropItem "BlueArmor";
