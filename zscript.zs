@@ -31,4 +31,9 @@ version "4.11"
 #include "invasion/spawners/hexen/itemspawner.zs"
 
 // Strife wrappers
-
+#include "invasion/spawners/strife/monsterspawner.zs"
+#include "invasion/spawners/strife/npcspawner.zs"
+#include "invasion/spawners/strife/weaponspawner.zs"
+#include "invasion/spawners/strife/healthspawner.zs"
+#include "invasion/spawners/strife/itemspawner.zs"
+#include "invasion/spawners/strife/powerupspawner.zs"

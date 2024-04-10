@@ -192,5 +192,94 @@ DoomEdNums
 	23554 = AmuletOfWardingSpawner
 	
 	// Strife
+	23555 = AcolyteTanSpawner
+	23556 = AcolyteRedSpawner
+	23557 = AcolyteRustSpawner
+	23558 = AcolyteGraySpawner
+	23559 = AcolyteDGreenSpawner
+	23560 = AcolyteLGreenSpawner
+	23561 = AcolyteGoldSpawner
+	23562 = AcolyteBlueSpawner
+	23563 = AcolyteShadowSpawner
+	23564 = Macil2Spawner
+	23565 = AlienSpectre1Spawner
+	23566 = AlienSpectre2Spawner
+	23567 = AlienSpectre3Spawner
+	23568 = AlienSpectre4Spawner
+	23569 = AlienSpectre5Spawner
+	23570 = EntityBossSpawner
+	23571 = EntitySecondSpawner
+	23572 = LoremasterSpawner
+	23573 = ProgrammerSpawner
+	23574 = StrifeBishopSpawner
+	23575 = SentinelSpawner
+	23576 = CrusaderSpawner
+	23577 = InquisitorSpawner
+	23578 = StalkerSpawner
+	23579 = CeilingTurretSpawner
+	23580 = TemplarSpawner
+	23581 = ReaverSpawner
 	
+	23582 = Rebel1Spawner
+	23583 = Rebel2Spawner
+	23584 = Beggar1Spawner
+	23585 = Peasant1Spawner
+	23586 = Peasant2Spawner
+	23587 = Peasant4Spawner
+	23588 = Peasant7Spawner
+	23589 = Peasant10Spawner
+	23590 = Peasant13Spawner
+	23591 = Peasant16Spawner
+	23592 = Peasant19Spawner
+	23593 = Peasant22Spawner
+	
+	23594 = StrifeCrossbowSpawner
+	23595 = StrifeCrossbow2Spawner
+	23596 = AssaultGunSpawner
+	23597 = AssaultGunStandingSpawner
+	23598 = MiniMissileLauncherSpawner
+	23599 = FlamethrowerSpawner
+	23600 = MaulerSpawner
+	23601 = Mauler2Spawner
+	23602 = StrifeGrenadeLauncherSpawner
+	23603 = StrifeGrenadeLauncher2Spawner
+	23604 = Sigil1Spawner
+	23605 = Sigil2Spawner
+	23606 = Sigil3Spawner
+	23607 = Sigil4Spawner
+	23608 = Sigil5Spawner
+	
+	23609 = AmmoSatchelSpawner
+	23610 = ElectricBoltsSpawner
+	23611 = PoisonBoltsSpawner
+	23612 = ClipOfBulletsSpawner
+	23613 = BoxOfBulletsSpawner
+	23614 = MiniMissilesSpawner
+	23615 = CrateOfMissilesSpawner
+	23616 = EnergyPodSpawner
+	23617 = EnergyPackSpawner
+	23618 = HEGrenadeRoundsSpawner
+	23619 = PhosphorusGrenadeRoundsSpawner
+	
+	23620 = StrifeMapSpawner
+	
+	23621 = SVETalismanRedSpawner
+	23622 = SVETalismanBlueSpawner
+	23623 = SVETalismanGreenSpawner
+	23624 = ShadowArmorSpawner
+	23625 = EnvironmentalSuitSpawner
+	23626 = TargeterSpawner
+	23627 = ScannerSpawner
+	23628 = TeleporterBeaconSpawner
+	23629 = CoinSpawner
+	23630 = Gold10Spawner
+	23631 = Gold25Spawner
+	23632 = Gold50Spawner
+	
+	23633 = MedPatchSpawner
+	23634 = MedicalKitSpawner
+	23635 = SurgeryKitSpawner
+	
+	23636 = LeatherArmorSpawner
+	23637 = MetalArmorSpawner
 }
