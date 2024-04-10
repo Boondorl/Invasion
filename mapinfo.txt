@@ -140,7 +140,7 @@ DoomEdNums
 	23506 = FireDemonSpawner
 	23507 = EttinSpawner
 	23508 = BishopSpawner
-	23509 = CentunarSpawner
+	23509 = CentaurSpawner
 	23510 = CentaurLeaderSpawner
 	23511 = SerpentSpawner
 	23512 = SerpentLeaderSpawner
