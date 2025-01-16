@@ -700,6 +700,18 @@ class Invasion : GameMode
         let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
 		return mode ? mode.GetRemainingInvasionEnemies() : -1;
 	}
+
+	clearscope static int GetLastEnemyThreshold(int id)
+	{
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
+		return mode ? mode.GetInvasionLastSpawnThreshold() : -1;
+	}
+
+	clearscope static int GetRemainingHealers(int id)
+	{
+		let mode = Invasion(GameModeHandler.Get().FindGameMode(id, "Invasion"));
+		return mode ? mode.GetRemainingInvasionHealers() : -1;
+	}
 	
 	clearscope static int GetWave(int id)
 	{

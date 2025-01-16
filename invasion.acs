@@ -101,6 +101,16 @@ function int GetRemainingEnemies(int id)
 	return ScriptCall("Invasion", "GetRemainingEnemies", id);
 }
 
+function int GetLastEnemyThreshold(int id)
+{
+	return ScriptCall("Invasion", "GetLastEnemyThreshold", id);
+}
+
+function int GetRemainingHealers(int id)
+{
+	return ScriptCall("Invasion", "GetRemainingHealers", id);
+}
+
 function void PauseSpawners(int tid, bool val)
 {
 	ScriptCall("Invasion", "PauseSpawners", tid, val);
