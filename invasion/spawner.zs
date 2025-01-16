@@ -250,7 +250,7 @@ class InvasionSpawner : Actor abstract
 		if (mo.bIsMonster && !mo.bFriendly && !(Args[FLAGS] & FL_NO_TARGET))
 		{
 			Actor nearest = GetNearestPlayer();
-			if (nearest)
+			if (nearest && mo.OkayToSwitchTarget(nearest))
 				mo.LastHeard = nearest;
 		}
 		
