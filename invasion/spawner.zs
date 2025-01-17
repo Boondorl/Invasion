@@ -325,8 +325,6 @@ class InvasionSpawner : Actor abstract
 		int s = Args[SPAWN_LIMIT];
 		if (s <= 0)
 			return 0;
-		if (s == 1)
-			return 1;
 		
 		if (Args[FLAGS] & FL_WAVE)
 			s += int(Ceil(Args[SPAWN_LIMIT] * user_WaveScale * (wave-user_StartWave)));
