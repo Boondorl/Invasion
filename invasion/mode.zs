@@ -147,7 +147,7 @@ class GameModeHandler : EventHandler
 	override void WorldLoaded(WorldEvent e)
 	{
 		if (!e.IsReopen)
-			mapSkill = 1 + int(Log(G_SkillPropertyInt(SKILLP_SpawnFilter)) / Log(2));
+			mapSkill = int(Log(G_SkillPropertyInt(SKILLP_SpawnFilter)) / Log(2));
 	}
 	
 	override void WorldTick()

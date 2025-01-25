@@ -331,11 +331,9 @@ class InvasionSpawner : Actor abstract
 		
 		if (Args[FLAGS] & FL_DIFFICULTY)
 		{
-			int skill = GameModeHandler.Get().GetMapSkill();
-			if (skill < 3)
-				s = int(Ceil(s - Args[SPAWN_LIMIT]*(1.0 - (1.0 / (1 + user_DifficultyScale*(3-skill))))));
-			else
-				s += int(Ceil(Args[SPAWN_LIMIT] * user_DifficultyScale * (skill-3)));
+			// Only scale between Easy, Normal, and Hard to make things easier to balance.
+			int skill = clamp(GameModeHandler.Get().GetMapSkill() - 1, 0, 2);
+			s += int(ceil(Args[SPAWN_LIMIT] * user_DifficultyScale * skill));
 		}
 		
 		if ((Args[FLAGS] & FL_PLAYER) && multiplayer)
