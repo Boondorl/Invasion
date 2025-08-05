@@ -1,0 +1,65 @@
+DoomEdNums
+{
+	23400 = DoomPossessedSpawner
+	23401 = DoomSmallMonsterSpawner
+	23402 = DoomLargeMonsterSpawner
+	23403 = DoomBossMonsterSpawner
+	
+	23404 = DoomZombieManSpawner
+	23405 = DoomShotgunGuySpawner
+	23406 = DoomChaingunGuySpawner
+	23407 = DoomImpSpawner
+	23408 = DoomDemonSpawner
+	23409 = DoomSpectreSpawner
+	23410 = DoomLostSoulSpawner
+	23411 = DoomRevenantSpawner
+	23412 = DoomCacodemonSpawner
+	23413 = DoomPainElementalSpawner
+	23414 = DoomHellKnightSpawner
+	23415 = DoomArachnotronSpawner
+	23416 = DoomFatsoSpawner
+	23417 = DoomArchvileSpawner
+	23418 = DoomBaronofHellSpawner
+	23419 = DoomCyberdemonSpawner
+	23420 = DoomSpiderMastermindSpawner
+	
+	23421 = DoomWeaponSpawner
+	23422 = DoomAmmoSpawner
+	23423 = DoomHeftySpawner
+	
+	23424 = DoomChainsawSpawner
+	23425 = DoomPistolSpawner
+	23426 = DoomShotgunSpawner
+	23427 = DoomSuperShotgunSpawner
+	23428 = DoomChaingunSpawner
+	23429 = DoomRocketLauncherSpawner
+	23430 = DoomPlasmaRifleSpawner
+	23431 = DoomBFG9000Spawner
+	
+	23432 = DoomBackpackSpawner
+	23433 = DoomClipSpawner
+	23434 = DoomClipBoxSpawner
+	23435 = DoomShellSpawner
+	23436 = DoomShellBoxSpawner
+	23437 = DoomRocketAmmoSpawner
+	23438 = DoomRocketBoxSpawner
+	23439 = DoomCellSpawner
+	23440 = DoomCellPackSpawner
+	
+	23441 = DoomSoulsphereSpawner
+	23442 = DoomMegasphereSpawner
+	23443 = DoomInvulnerabilitySphereSpawner
+	23444 = DoomBlurSphereSpawner
+	23445 = DoomRadSuitSpawner
+	23446 = DoomInfraredSpawner
+	23447 = DoomAllmapSpawner
+	23448 = DoomBerserkSpawner
+	
+	23449 = DoomHealthBonusSpawner
+	23450 = DoomStimpackSpawner
+	23451 = DoomMedikitSpawner
+	
+	23452 = DoomArmorBonusSpawner
+	23453 = DoomGreenArmorSpawner
+	23454 = DoomBlueArmorSpawner
+}
