@@ -5,7 +5,7 @@ GameInfo
 
 DoomEdNums
 {
-	23397 = GenericInvasionSpawner
-	23398 = FutureInvasionPlayerStart
-	23399 = MonsterPusher
+	20000 = GenericInvasionSpawner
+	20001 = FutureInvasionPlayerStart
+	20002 = MonsterPusher
 }

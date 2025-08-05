@@ -1,65 +1,72 @@
 DoomEdNums
 {
-	23400 = DoomPossessedSpawner
-	23401 = DoomSmallMonsterSpawner
-	23402 = DoomLargeMonsterSpawner
-	23403 = DoomBossMonsterSpawner
+	// Random spawners
+	21000 = DoomPossessedSpawner
+	21001 = DoomSmallMonsterSpawner
+	21002 = DoomLargeMonsterSpawner
+	21003 = DoomBossMonsterSpawner
+	21004 = DoomWeaponSpawner
+	21005 = DoomAmmoSpawner
+	21006 = DoomHeftySpawner
+	21007 = DoomHealthPowerupSpawner
+	21008 = DoomBigPowerupSpawner
+	21009 = DoomBonusSpawner
 	
-	23404 = DoomZombieManSpawner
-	23405 = DoomShotgunGuySpawner
-	23406 = DoomChaingunGuySpawner
-	23407 = DoomImpSpawner
-	23408 = DoomDemonSpawner
-	23409 = DoomSpectreSpawner
-	23410 = DoomLostSoulSpawner
-	23411 = DoomRevenantSpawner
-	23412 = DoomCacodemonSpawner
-	23413 = DoomPainElementalSpawner
-	23414 = DoomHellKnightSpawner
-	23415 = DoomArachnotronSpawner
-	23416 = DoomFatsoSpawner
-	23417 = DoomArchvileSpawner
-	23418 = DoomBaronofHellSpawner
-	23419 = DoomCyberdemonSpawner
-	23420 = DoomSpiderMastermindSpawner
+	// Monsters
+	21100 = DoomZombieManSpawner
+	21101 = DoomShotgunGuySpawner
+	21102 = DoomChaingunGuySpawner
+	21103 = DoomImpSpawner
+	21104 = DoomDemonSpawner
+	21105 = DoomSpectreSpawner
+	21106 = DoomLostSoulSpawner
+	21107 = DoomRevenantSpawner
+	21108 = DoomCacodemonSpawner
+	21109 = DoomPainElementalSpawner
+	21110 = DoomHellKnightSpawner
+	21111 = DoomArachnotronSpawner
+	21112 = DoomFatsoSpawner
+	21113 = DoomArchvileSpawner
+	21114 = DoomBaronofHellSpawner
+	21115 = DoomCyberdemonSpawner
+	21116 = DoomSpiderMastermindSpawner
 	
-	23421 = DoomWeaponSpawner
-	23422 = DoomAmmoSpawner
-	23423 = DoomHeftySpawner
+	// Weapons
+	21200 = DoomChainsawSpawner
+	21201 = DoomPistolSpawner
+	21203 = DoomShotgunSpawner
+	21204 = DoomSuperShotgunSpawner
+	21205 = DoomChaingunSpawner
+	21206 = DoomRocketLauncherSpawner
+	21207 = DoomPlasmaRifleSpawner
+	21208 = DoomBFG9000Spawner
 	
-	23424 = DoomChainsawSpawner
-	23425 = DoomPistolSpawner
-	23426 = DoomShotgunSpawner
-	23427 = DoomSuperShotgunSpawner
-	23428 = DoomChaingunSpawner
-	23429 = DoomRocketLauncherSpawner
-	23430 = DoomPlasmaRifleSpawner
-	23431 = DoomBFG9000Spawner
+	// Ammo
+	21300 = DoomBackpackSpawner
+	21301 = DoomClipSpawner
+	21302 = DoomClipBoxSpawner
+	21303 = DoomShellSpawner
+	21304 = DoomShellBoxSpawner
+	21305 = DoomRocketAmmoSpawner
+	21306 = DoomRocketBoxSpawner
+	21307 = DoomCellSpawner
+	21308 = DoomCellPackSpawner
 	
-	23432 = DoomBackpackSpawner
-	23433 = DoomClipSpawner
-	23434 = DoomClipBoxSpawner
-	23435 = DoomShellSpawner
-	23436 = DoomShellBoxSpawner
-	23437 = DoomRocketAmmoSpawner
-	23438 = DoomRocketBoxSpawner
-	23439 = DoomCellSpawner
-	23440 = DoomCellPackSpawner
+	// Powerups
+	21400 = DoomSoulsphereSpawner
+	21401 = DoomMegasphereSpawner
+	21402 = DoomInvulnerabilitySphereSpawner
+	21403 = DoomBlurSphereSpawner
+	21404 = DoomRadSuitSpawner
+	21405 = DoomInfraredSpawner
+	21406 = DoomAllmapSpawner
+	21407 = DoomBerserkSpawner
 	
-	23441 = DoomSoulsphereSpawner
-	23442 = DoomMegasphereSpawner
-	23443 = DoomInvulnerabilitySphereSpawner
-	23444 = DoomBlurSphereSpawner
-	23445 = DoomRadSuitSpawner
-	23446 = DoomInfraredSpawner
-	23447 = DoomAllmapSpawner
-	23448 = DoomBerserkSpawner
-	
-	23449 = DoomHealthBonusSpawner
-	23450 = DoomStimpackSpawner
-	23451 = DoomMedikitSpawner
-	
-	23452 = DoomArmorBonusSpawner
-	23453 = DoomGreenArmorSpawner
-	23454 = DoomBlueArmorSpawner
+	// Health
+	21500 = DoomHealthBonusSpawner
+	21501 = DoomStimpackSpawner
+	21502 = DoomMedikitSpawner
+	21503 = DoomArmorBonusSpawner
+	21504 = DoomGreenArmorSpawner
+	21505 = DoomBlueArmorSpawner
 }
