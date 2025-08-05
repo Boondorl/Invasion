@@ -1,40 +1,40 @@
-class PossessedSpawner : InvasionSpawner
+class DoomPossessedSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Monsters/Random
-		//$Title Random Zombie
+		//$Category Invasion/Doom/Random
+		//$Title Random Zombie Spawner
 		//$Sprite POSSA1
 		DropItem "ZombieMan";
 		DropItem "ShotgunGuy";
 		DropItem "ChaingunGuy";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class LightMonsterSpawner : InvasionSpawner
+class DoomSmallMonsterSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Monsters/Random
-		//$Title Random Small Demon
+		//$Category Invasion/Doom/Random
+		//$Title Random Small Demon Spawner
 		//$Sprite TROOA1
 		DropItem "DoomImp";
 		DropItem "Demon";
 		DropItem "Spectre";
 		DropItem "LostSoul";
-		Radius 30;
-		Height 56;
+		Radius 30.0;
+		Height 56.0;
 	}
 }
 
-class HeavyMonsterSpawner : InvasionSpawner
+class DoomLargeMonsterSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Monsters/Random
-		//$Title Random Large Demon
+		//$Category Invasion/Doom/Random
+		//$Title Random Large Demon Spawner
 		//$Sprite BOS2A1C1
 		DropItem "Arachnotron";
 		DropItem "BaronOfHell";
@@ -43,26 +43,26 @@ class HeavyMonsterSpawner : InvasionSpawner
 		DropItem "Fatso";
 		DropItem "PainElemental";
 		DropItem "Revenant";
-		Radius 64;
-		Height 64;
+		Radius 64.0;
+		Height 64.0;
 	}
 }
 
-class BossSpawner : InvasionSpawner
+class DoomBossMonsterSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Monsters/Random
-		//$Title Random Boss
+		//$Category Invasion/Doom/Random
+		//$Title Random Boss Demon Spawner
 		//$Sprite CYBRA1
 		DropItem "Cyberdemon";
 		DropItem "SpiderMastermind";
-		Radius 128;
-		Height 110;
+		Radius 128.0;
+		Height 110.0;
 	}
 }
 
-class GruntSpawner : InvasionSpawner
+class DoomZombieManSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -70,12 +70,12 @@ class GruntSpawner : InvasionSpawner
 		//$Title Grunt Spawner
 		//$Sprite POSSA1
 		DropItem "ZombieMan";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class SergeantSpawner : InvasionSpawner
+class DoomShotgunGuySpawner : InvasionSpawner
 {
 	Default
 	{
@@ -83,12 +83,12 @@ class SergeantSpawner : InvasionSpawner
 		//$Title Sergeant Spawner
 		//$Sprite SPOSA1
 		DropItem "ShotgunGuy";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class CommandoSpawner : InvasionSpawner
+class DoomChaingunGuySpawner : InvasionSpawner
 {
 	Default
 	{
@@ -96,12 +96,12 @@ class CommandoSpawner : InvasionSpawner
 		//$Title Commando Spawner
 		//$Sprite CPOSA1
 		DropItem "ChaingunGuy";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class ImpSpawner : InvasionSpawner
+class DoomImpSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -109,12 +109,12 @@ class ImpSpawner : InvasionSpawner
 		//$Title Imp Spawner
 		//$Sprite TROOA1
 		DropItem "DoomImp";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class DemonSpawner : InvasionSpawner
+class DoomDemonSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -122,12 +122,12 @@ class DemonSpawner : InvasionSpawner
 		//$Title Pinkie Spawner
 		//$Sprite SARGA1
 		DropItem "Demon";
-		Radius 30;
-		Height 56;
+		Radius 30.0;
+		Height 56.0;
 	}
 }
 
-class SpectreSpawner : InvasionSpawner
+class DoomSpectreSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -135,14 +135,14 @@ class SpectreSpawner : InvasionSpawner
 		//$Title Spectre Spawner
 		//$Sprite SARGA1
 		DropItem "Spectre";
-		Radius 30;
-		Height 56;
+		Radius 30.0;
+		Height 56.0;
 		RenderStyle "Translucent";
 		Alpha 0.5;
 	}
 }
 
-class LostSoulSpawner : InvasionSpawner
+class DoomLostSoulSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -150,13 +150,13 @@ class LostSoulSpawner : InvasionSpawner
 		//$Title Lost Soul Spawner
 		//$Sprite SKULA1
 		DropItem "LostSoul";
-		Radius 16;
-		Height 56;
+		Radius 16.0;
+		Height 56.0;
 		RenderStyle "SoulTrans";
 	}
 }
 
-class CacodemonSpawner : InvasionSpawner
+class DoomCacodemonSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -164,12 +164,12 @@ class CacodemonSpawner : InvasionSpawner
 		//$Title Cacodemon Spawner
 		//$Sprite HEADA1
 		DropItem "Cacodemon";
-		Radius 31;
-		Height 56;
+		Radius 31.0;
+		Height 56.0;
 	}
 }
 
-class PainElementalSpawner : InvasionSpawner
+class DoomPainElementalSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -177,12 +177,12 @@ class PainElementalSpawner : InvasionSpawner
 		//$Title Pain Elemental Spawner
 		//$Sprite PAINA1
 		DropItem "PainElemental";
-		Radius 31;
-		Height 56;
+		Radius 31.0;
+		Height 56.0;
 	}
 }
 
-class RevenantSpawner : InvasionSpawner
+class DoomRevenantSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -190,12 +190,12 @@ class RevenantSpawner : InvasionSpawner
 		//$Title Revenant Spawner
 		//$Sprite SKELA1D1
 		DropItem "Revenant";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class HellKnightSpawner : InvasionSpawner
+class DoomHellKnightSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -203,12 +203,12 @@ class HellKnightSpawner : InvasionSpawner
 		//$Title Hell Knight Spawner
 		//$Sprite BOS2A1C1
 		DropItem "HellKnight";
-		Radius 24;
-		Height 64;
+		Radius 24.0;
+		Height 64.0;
 	}
 }
 
-class BaronSpawner : InvasionSpawner
+class DoomBaronofHellSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -216,12 +216,12 @@ class BaronSpawner : InvasionSpawner
 		//$Title Baron of Hell Spawner
 		//$Sprite BOSSA1
 		DropItem "BaronofHell";
-		Radius 24;
-		Height 64;
+		Radius 24.0;
+		Height 64.0;
 	}
 }
 
-class FatsoSpawner : InvasionSpawner
+class DoomFatsoSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -229,12 +229,12 @@ class FatsoSpawner : InvasionSpawner
 		//$Title Mancubus Spawner
 		//$Sprite FATTA1
 		DropItem "Fatso";
-		Radius 48;
-		Height 64;
+		Radius 48.0;
+		Height 64.0;
 	}
 }
 
-class ArachnotronSpawner : InvasionSpawner
+class DoomArachnotronSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -242,13 +242,13 @@ class ArachnotronSpawner : InvasionSpawner
 		//$Title Arachnotron Spawner
 		//$Sprite BSPIA1D1
 		DropItem "Arachnotron";
-		Radius 64;
-		Height 64;
+		Radius 64.0;
+		Height 64.0;
 	}
 }
 
 
-class ArchvileSpawner : InvasionSpawner
+class DoomArchvileSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -256,12 +256,12 @@ class ArchvileSpawner : InvasionSpawner
 		//$Title Arch-vile Spawner
 		//$Sprite VILEA1D1
 		DropItem "Archvile";
-		Radius 20;
-		Height 56;
+		Radius 20.0;
+		Height 56.0;
 	}
 }
 
-class CyberdemonSpawner : InvasionSpawner
+class DoomCyberdemonSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -269,12 +269,12 @@ class CyberdemonSpawner : InvasionSpawner
 		//$Title Cyberdemon Spawner
 		//$Sprite CYBRA1
 		DropItem "Cyberdemon";
-		Radius 40;
-		Height 110;
+		Radius 40.0;
+		Height 110.0;
 	}
 }
 
-class MastermindSpawner : InvasionSpawner
+class DoomSpiderMastermindSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -282,7 +282,7 @@ class MastermindSpawner : InvasionSpawner
 		//$Title Spider Mastermind Spawner
 		//$Sprite SPIDA1D1
 		DropItem "SpiderMastermind";
-		Radius 128;
-		Height 100;
+		Radius 128.0;
+		Height 100.0;
 	}
 }

@@ -1,4 +1,18 @@
-class HealthBonusSpawner : InvasionSpawner
+class DoomBonusSpawner : InvasionSpawner
+{
+	Default
+	{
+		//$Category Invasion/Doom/Random
+		//$Title Random Bonus Spawner
+		//$Sprite BON1A0
+		DropItem "HealthBonus";
+		DropItem "ArmorBonus";
+		Radius 20.0;
+		Height 16.0;
+	}
+}
+
+class DoomHealthBonusSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -6,12 +20,12 @@ class HealthBonusSpawner : InvasionSpawner
 		//$Title Health Bonus Spawner
 		//$Sprite BON1A0
 		DropItem "HealthBonus";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class StimpackSpawner : InvasionSpawner
+class DoomStimpackSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -19,12 +33,12 @@ class StimpackSpawner : InvasionSpawner
 		//$Title Stimpack Spawner
 		//$Sprite STIMA0
 		DropItem "Stimpack";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class MedikitSpawner : InvasionSpawner
+class DoomMedikitSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -32,12 +46,12 @@ class MedikitSpawner : InvasionSpawner
 		//$Title Medikit Spawner
 		//$Sprite MEDIA0
 		DropItem "Medikit";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ArmorBonusSpawner : InvasionSpawner
+class DoomArmorBonusSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -45,12 +59,12 @@ class ArmorBonusSpawner : InvasionSpawner
 		//$Title Armor Bonus Spawner
 		//$Sprite BON2A0
 		DropItem "ArmorBonus";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class GreenArmorSpawner : InvasionSpawner
+class DoomGreenArmorSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -58,12 +72,12 @@ class GreenArmorSpawner : InvasionSpawner
 		//$Title Green Armor Spawner
 		//$Sprite ARM1A0
 		DropItem "GreenArmor";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class BlueArmorSpawner : InvasionSpawner
+class DoomBlueArmorSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -71,7 +85,7 @@ class BlueArmorSpawner : InvasionSpawner
 		//$Title Blue Armor Spawner
 		//$Sprite ARM2A0
 		DropItem "BlueArmor";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }

@@ -1,8 +1,8 @@
-class WeaponSpawner : InvasionSpawner
+class DoomWeaponSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Weapons/Random
+		//$Category Invasion/Doom/Random
 		//$Title Random Weapon Spawner
 		//$Sprite SHOTA0
 		DropItem "Shotgun";
@@ -10,44 +10,44 @@ class WeaponSpawner : InvasionSpawner
 		DropItem "Chaingun";
 		DropItem "RocketLauncher";
 		DropItem "PlasmaRifle";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class SmallAmmoSpawner : InvasionSpawner
+class DoomAmmoSpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Weapons/Random
-		//$Title Random Small Ammo Spawner
+		//$Category Invasion/Doom/Random
+		//$Title Random Ammo Spawner
 		//$Sprite CLIPA0
 		DropItem "Clip";
 		DropItem "Shell";
 		DropItem "RocketAmmo";
 		DropItem "Cell";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class LargeAmmoSpawner : InvasionSpawner
+class DoomHeftySpawner : InvasionSpawner
 {
 	Default
 	{
-		//$Category Invasion/Doom/Weapons/Random
-		//$Title Random Larger Ammo Spawner
+		//$Category Invasion/Doom/Random
+		//$Title Random Hefty Ammo Spawner
 		//$Sprite AMMOA0
 		DropItem "ClipBox";
 		DropItem "ShellBox";
 		DropItem "RocketBox";
 		DropItem "CellPack";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ChainsawSpawner : InvasionSpawner
+class DoomChainsawSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -55,12 +55,12 @@ class ChainsawSpawner : InvasionSpawner
 		//$Title Chainsaw Spawner
 		//$Sprite CSAWA0
 		DropItem "Chainsaw";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class PistolSpawner : InvasionSpawner
+class DoomPistolSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -68,12 +68,12 @@ class PistolSpawner : InvasionSpawner
 		//$Title Pistol Spawner
 		//$Sprite PISTA0
 		DropItem "Pistol";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ShotgunSpawner : InvasionSpawner
+class DoomShotgunSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -81,12 +81,12 @@ class ShotgunSpawner : InvasionSpawner
 		//$Title Shotgun Spawner
 		//$Sprite SHOTA0
 		DropItem "Shotgun";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class SuperShotgunSpawner : InvasionSpawner
+class DoomSuperShotgunSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -94,12 +94,12 @@ class SuperShotgunSpawner : InvasionSpawner
 		//$Title Super Shotgun Spawner
 		//$Sprite SGN2A0
 		DropItem "SuperShotgun";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ChaingunSpawner : InvasionSpawner
+class DoomChaingunSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -107,12 +107,12 @@ class ChaingunSpawner : InvasionSpawner
 		//$Title Chaingun Spawner
 		//$Sprite MGUNA0
 		DropItem "Chaingun";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class RocketLauncherSpawner : InvasionSpawner
+class DoomRocketLauncherSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -120,12 +120,12 @@ class RocketLauncherSpawner : InvasionSpawner
 		//$Title Rocket Launcher Spawner
 		//$Sprite LAUNA0
 		DropItem "RocketLauncher";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class PlasmaRifleSpawner : InvasionSpawner
+class DoomPlasmaRifleSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -133,12 +133,12 @@ class PlasmaRifleSpawner : InvasionSpawner
 		//$Title Plasma Rifle Spawner
 		//$Sprite PLASA0
 		DropItem "PlasmaRifle";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class BFG9000Spawner : InvasionSpawner
+class DoomBFG9000Spawner : InvasionSpawner
 {
 	Default
 	{
@@ -146,12 +146,12 @@ class BFG9000Spawner : InvasionSpawner
 		//$Title BFG 9000 Spawner
 		//$Sprite BFUGA0
 		DropItem "BFG9000";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ClipSpawner : InvasionSpawner
+class DoomClipSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -159,12 +159,12 @@ class ClipSpawner : InvasionSpawner
 		//$Title Clip Spawner
 		//$Sprite CLIPA0
 		DropItem "Clip";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ClipBoxSpawner : InvasionSpawner
+class DoomClipBoxSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -172,12 +172,12 @@ class ClipBoxSpawner : InvasionSpawner
 		//$Title Clip Box Spawner
 		//$Sprite AMMOA0
 		DropItem "ClipBox";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ShellSpawner : InvasionSpawner
+class DoomShellSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -185,12 +185,12 @@ class ShellSpawner : InvasionSpawner
 		//$Title Shell Spawner
 		//$Sprite SHELA0
 		DropItem "Shell";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class ShellBoxSpawner : InvasionSpawner
+class DoomShellBoxSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -198,25 +198,25 @@ class ShellBoxSpawner : InvasionSpawner
 		//$Title Shell Box Spawner
 		//$Sprite SBOXA0
 		DropItem "ShellBox";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class RocketSpawner : InvasionSpawner
+class DoomRocketAmmoSpawner : InvasionSpawner
 {
 	Default
 	{
 		//$Category Invasion/Doom/Weapons/Ammo
-		//$Title Rocket Spawner
+		//$Title Rocket Ammo Spawner
 		//$Sprite ROCKA0
 		DropItem "RocketAmmo";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class RocketBoxSpawner : InvasionSpawner
+class DoomRocketBoxSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -224,12 +224,12 @@ class RocketBoxSpawner : InvasionSpawner
 		//$Title Rocket Box Spawner
 		//$Sprite BROKA0
 		DropItem "RocketBox";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class CellSpawner : InvasionSpawner
+class DoomCellSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -237,12 +237,12 @@ class CellSpawner : InvasionSpawner
 		//$Title Cell Spawner
 		//$Sprite CELLA0
 		DropItem "Cell";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class CellPackSpawner : InvasionSpawner
+class DoomCellPackSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -250,12 +250,12 @@ class CellPackSpawner : InvasionSpawner
 		//$Title Cell Pack Spawner
 		//$Sprite CELPA0
 		DropItem "CellPack";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
 
-class BackpackSpawner : InvasionSpawner
+class DoomBackpackSpawner : InvasionSpawner
 {
 	Default
 	{
@@ -263,7 +263,7 @@ class BackpackSpawner : InvasionSpawner
 		//$Title Backpack Spawner
 		//$Sprite BPAKA0
 		DropItem "Backpack";
-		Radius 20;
-		Height 16;
+		Radius 20.0;
+		Height 16.0;
 	}
 }
