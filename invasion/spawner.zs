@@ -1,15 +1,15 @@
-class InvasionType
+class InvasionSpawnType
 {
 	private class<Actor> type;
 	private int probability;
 
-	static InvasionType Create(class<Actor> type, int probability)
+	static InvasionSpawnType Create(class<Actor> type, int probability)
 	{
-		let it = new("InvasionType");
-		it.type = type;
-		it.probability = probability;
+		let ist = new("InvasionSpawnType");
+		ist.type = type;
+		ist.probability = probability;
 
-		return it;
+		return ist;
 	}
 
 	clearscope class<Actor> GetType() const
@@ -27,16 +27,16 @@ class InvasionSpawner : Actor abstract
 {
 	const DEFAULT_STAT = Thinker.STAT_STATIC + 2;
 
-	enum ESpawnerArgs
+	enum EInvasionSpawnerArgs
 	{
-		SCRIPT,
-		ACTOR_TID,
-		SPAWN_DELAY,
-		SPAWN_LIMIT,
-		FLAGS
+		ARG_SCRIPT,
+		ARG_ACTOR_TID,
+		ARG_SPAWN_DELAY,
+		ARG_SPAWN_LIMIT,
+		ARG_FLAGS,
 	}
 
-	enum EFlags
+	enum EInvasionSpawnerFlags
 	{
 		FL_NONE 		= 0,
 		FL_RESET 		= 1,
@@ -55,7 +55,7 @@ class InvasionSpawner : Actor abstract
 
 	// Meta info
 	private Invasion mode;
-	private Array<InvasionType> spawnTypes;
+	private Array<InvasionSpawnType> spawnTypes;
 	private int weight;
 	private bool bDontCount;
 
@@ -149,7 +149,7 @@ class InvasionSpawner : Actor abstract
 		if (!mode)
 			return;
 
-		if ((Args[FLAGS] & FL_SEQUENCE) && Target
+		if ((Args[ARG_FLAGS] & FL_SEQUENCE) && Target
 			&& ((Target.bIsMonster && Target.bKilled) || (item && item.Owner)))
 		{
 			Target = null;
@@ -160,10 +160,10 @@ class InvasionSpawner : Actor abstract
 			return;
 		
 		if (!bDormant && !bPaused
-			&& (Args[SPAWN_LIMIT] <= 0 || spawnLimit > 0)
-			&& (!(Args[FLAGS] & FL_SEQUENCE) || !Target)
-			&& (mode.GetInvasionState() == Invasion.IS_ACTIVE || ((Args[FLAGS] & FL_ALWAYS) && (!(Args[FLAGS] & FL_WAIT_FIRST) || bSpawned)))
-			&& (!(Args[FLAGS] & FL_WAIT_MONST) || mode.GetRemainingInvasionEnemies() <= mode.GetInvasionLastSpawnThreshold())
+			&& (Args[ARG_SPAWN_LIMIT] <= 0 || spawnLimit > 0)
+			&& (!(Args[ARG_FLAGS] & FL_SEQUENCE) || !Target)
+			&& (mode.GetInvasionState() == Invasion.IS_ACTIVE || ((Args[ARG_FLAGS] & FL_ALWAYS) && (!(Args[ARG_FLAGS] & FL_WAIT_FIRST) || bSpawned)))
+			&& (!(Args[ARG_FLAGS] & FL_WAIT_MONST) || mode.GetRemainingInvasionEnemies() <= mode.GetInvasionLastSpawnThreshold())
 			&& --timer <= 0)
 		{
 			SpawnActor();
@@ -176,7 +176,7 @@ class InvasionSpawner : Actor abstract
 		bDontCount |= !def.bIsMonster || def.bFriendly;
 
 		probability = Max(1, probability);
-		spawnTypes.Push(InvasionType.Create(type, probability));
+		spawnTypes.Push(InvasionSpawnType.Create(type, probability));
 		weight += probability;
 	}
 	
@@ -213,7 +213,7 @@ class InvasionSpawner : Actor abstract
 			return;
 		}
 		
-		let [temp, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: Args[ACTOR_TID]);
+		let [temp, mo] = A_SpawnItemEx(type, flags: SXF_TRANSFERAMBUSHFLAG|SXF_NOCHECKPOSITION, tid: Args[ARG_ACTOR_TID]);
 		// Handle these manually because they're too much of a hassle to handle otherwise.
 		while (mo is "RandomSpawner")
 		{
@@ -247,14 +247,14 @@ class InvasionSpawner : Actor abstract
 		}
 
 		mode.AddWaveMonster(mo, CountMonster() && spawnLimit > 0);
-		if (mo.bIsMonster && !mo.bFriendly && !(Args[FLAGS] & FL_NO_TARGET))
+		if (mo.bIsMonster && !mo.bFriendly && !(Args[ARG_FLAGS] & FL_NO_TARGET))
 		{
 			Actor nearest = GetNearestPlayer();
 			if (nearest && mo.OkayToSwitchTarget(nearest))
 				mo.LastHeard = nearest;
 		}
 		
-		if ((!(Args[FLAGS] & FL_SILENT) || bSpawned) && !(Args[FLAGS] & FL_NO_FOG))
+		if ((!(Args[ARG_FLAGS] & FL_SILENT) || bSpawned) && !(Args[ARG_FLAGS] & FL_NO_FOG))
 		{
 			let tf = Spawn(mo.TeleFogDestType, mo.Pos, ALLOW_REPLACE);
 			if (tf)
@@ -263,18 +263,18 @@ class InvasionSpawner : Actor abstract
 		
 		if (spawnLimit > 0)
 			--spawnLimit;
-		if (Args[FLAGS] & FL_SEQUENCE)
+		if (Args[ARG_FLAGS] & FL_SEQUENCE)
 		{
 			Target = mo;
 			item = Inventory(mo);
 		}
-		if (Args[SCRIPT])
+		if (Args[ARG_SCRIPT])
 		{
-			Actor caller = Args[FLAGS] & FL_SET_CALLER ? mo : Actor(self);
-			Level.ExecuteSpecial(226, caller, null, false, Args[SCRIPT]);
+			Actor caller = Args[ARG_FLAGS] & FL_SET_CALLER ? mo : Actor(self);
+			Level.ExecuteSpecial(226, caller, null, false, Args[ARG_SCRIPT]);
 		}
 		
-		timer = Args[SPAWN_DELAY];
+		timer = Args[ARG_SPAWN_DELAY];
 		bSpawned = true;
 	}
 	
@@ -322,27 +322,27 @@ class InvasionSpawner : Actor abstract
 	
 	clearscope int GetSpawnAmount(int wave) const
 	{
-		int s = Args[SPAWN_LIMIT];
+		int s = Args[ARG_SPAWN_LIMIT];
 		if (s <= 0)
 			return 0;
 		
-		if (Args[FLAGS] & FL_WAVE)
-			s += int(Ceil(Args[SPAWN_LIMIT] * user_WaveScale * (wave-user_StartWave)));
+		if (Args[ARG_FLAGS] & FL_WAVE)
+			s += int(Ceil(Args[ARG_SPAWN_LIMIT] * user_WaveScale * (wave-user_StartWave)));
 		
-		if (Args[FLAGS] & FL_DIFFICULTY)
+		if (Args[ARG_FLAGS] & FL_DIFFICULTY)
 		{
 			// Only scale between Easy, Normal, and Hard to make things easier to balance.
 			int skill = clamp(GameModeHandler.Get().GetMapSkill() - 1, 0, 2);
-			s += int(ceil(Args[SPAWN_LIMIT] * user_DifficultyScale * skill));
+			s += int(ceil(Args[ARG_SPAWN_LIMIT] * user_DifficultyScale * skill));
 		}
 		
-		if ((Args[FLAGS] & FL_PLAYER) && multiplayer)
+		if ((Args[ARG_FLAGS] & FL_PLAYER) && multiplayer)
 		{
 			int count;
 			for (int i; i < MAXPLAYERS; ++i)
 				count += PlayerInGame[i];
 			
-			s += int(Ceil(Args[SPAWN_LIMIT] * user_PlayerScale * --count));
+			s += int(Ceil(Args[ARG_SPAWN_LIMIT] * user_PlayerScale * --count));
 		}
 
 		return Max(0, s);
@@ -350,7 +350,7 @@ class InvasionSpawner : Actor abstract
 	
 	clearscope int GetSpawnDelay() const
 	{
-		return user_InitialSpawnDelay < 0 ? Args[SPAWN_DELAY] * Abs(user_InitialSpawnDelay) : user_InitialSpawnDelay;
+		return user_InitialSpawnDelay < 0 ? Args[ARG_SPAWN_DELAY] * Abs(user_InitialSpawnDelay) : user_InitialSpawnDelay;
 	}
 	
 	clearscope bool ShouldActivate(int wave) const
@@ -415,7 +415,7 @@ class InvasionSpawner : Actor abstract
 	}
 }
 
-class GenericSpawner : InvasionSpawner
+class GenericInvasionSpawner: InvasionSpawner
 {
 	private bool bInitialized;
 

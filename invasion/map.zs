@@ -2,11 +2,11 @@ class MonsterPusher : Actor
 {
 	const IDLE_STAT = Thinker.STAT_STATIC + 3;
 
-	enum EPusherArgs
+	enum EMonsterPusherArgs
 	{
-		SEC_TAG,
-		PUSH_POW,
-		PUSH_RAD
+		ARG_SEC_TAG,
+		ARG_PUSH_POW,
+		ARG_PUSH_RAD,
 	}
 
 	private Array<Sector> sectors;
@@ -45,10 +45,10 @@ class MonsterPusher : Actor
 	{
 		Super.PostBeginPlay();
 
-		if (Args[SEC_TAG])
+		if (Args[ARG_SEC_TAG])
 		{
 			int secID;
-			let it = Level.CreateSectorTagIterator(Args[SEC_TAG]);
+			let it = Level.CreateSectorTagIterator(Args[ARG_SEC_TAG]);
 			while ((secID = it.Next()) >= 0)
 				sectors.Push(Level.Sectors[secID]);
 		}
@@ -74,18 +74,18 @@ class MonsterPusher : Actor
 	
 	override void Tick()
 	{
-		if ((FreezeTics > 0u && --FreezeTics >= 0u) || !Args[PUSH_POW] || IsFrozen())
+		if ((FreezeTics > 0u && --FreezeTics >= 0u) || !Args[ARG_PUSH_POW] || IsFrozen())
 			return;
 		
-		double power = Abs(Args[PUSH_POW]);
+		double power = Abs(Args[ARG_PUSH_POW]);
 		Vector2 dir = Angle.ToVector();
-		if (Args[PUSH_POW] < 0)
+		if (Args[ARG_PUSH_POW] < 0)
 			dir = -dir;
 
-		if (Args[PUSH_RAD] > 0)
+		if (Args[ARG_PUSH_RAD] > 0)
 		{
-			double radSq = Args[PUSH_RAD] * Args[PUSH_RAD];
-			let it = BlockThingsIterator.Create(self, Args[PUSH_RAD]);
+			double radSq = Args[ARG_PUSH_RAD] * Args[ARG_PUSH_RAD];
+			let it = BlockThingsIterator.Create(self, Args[ARG_PUSH_RAD]);
 			while (it.Next())
 			{
 				Actor mo = it.Thing;
@@ -124,14 +124,14 @@ class MonsterPusher : Actor
 	}
 }
 
-class FuturePlayerStart : Actor
+class FutureInvasionPlayerStart : Actor
 {
 	const DEFAULT_STAT = Thinker.STAT_STATIC + 1;
 
-	enum EFuturePlayerArgs
+	enum EFutureInvasionPlayerStartArgs
 	{
-		PLAY_NUM,
-		START_WAVE
+		ARG_PLAY_NUM,
+		ARG_START_WAVE,
 	}
 
 	int user_InvasionID;

@@ -1,19 +1,19 @@
-class FuturePlayerStarts
+class FutureInvasionPlayerStarts
 {
 	private int wave;
-	private FuturePlayerStart starts[MAXPLAYERS];
+	private FutureInvasionPlayerStart starts[MAXPLAYERS];
 
-	static FuturePlayerStarts Create(int wave)
+	static FutureInvasionPlayerStarts Create(int wave)
 	{
-		let fps = new("FuturePlayerStarts");
-		fps.wave = Max(wave, 1);
+		let fips = new("FutureInvasionPlayerStarts");
+		fips.wave = Max(wave, 1);
 
-		return fps;
+		return fips;
 	}
 
-	void AddStart(FuturePlayerStart start)
+	void AddStart(FutureInvasionPlayerStart start)
 	{
-        int num = start.Args[FuturePlayerStart.PLAY_NUM] - 1;
+        int num = start.Args[FutureInvasionPlayerStart.ARG_PLAY_NUM] - 1;
         if (num >= 0 && num < MAXPLAYERS)
             starts[num] = start;
 	}
@@ -23,7 +23,7 @@ class FuturePlayerStarts
 		return wave;
 	}
 
-	clearscope FuturePlayerStart GetStart(int playNum) const
+	clearscope FutureInvasionPlayerStart GetStart(int playNum) const
 	{
 		return playNum < 0 || playNum >= MAXPLAYERS ? null : starts[playNum];
 	}
@@ -42,7 +42,7 @@ class Invasion : GameMode
         IS_ENDED,
         IS_COUNTDOWN,
         IS_ACTIVE,
-        IS_VICTORY
+        IS_VICTORY,
     }
 
     // Invasion info
@@ -60,7 +60,7 @@ class Invasion : GameMode
 	private int wave;
 	private int timer;
 
-	private Array<FuturePlayerStarts> playerStarts;
+	private Array<FutureInvasionPlayerStarts> playerStarts;
 	private Array<InvasionSpawner> spawners;
 	private Array<Actor> waveMonsters, countedMonsters;
 
@@ -180,8 +180,8 @@ class Invasion : GameMode
 			if (s.user_InvasionID == GetID())
 			{
 				spawners.Push(s);
-				if (s is "GenericSpawner")
-					GenericSpawner(s).Initialize();
+				if (s is "GenericInvasionSpawner")
+					GenericInvasionSpawner(s).Initialize();
 					
 				s.Reset(true, true);
 				s.ActivateSpawner(s.ShouldActivate(wave), self);
@@ -189,9 +189,9 @@ class Invasion : GameMode
 		}	
 
 		// Cache player starts local to the invasion.
-		FuturePlayerStart start;
-		it = ThinkerIterator.Create("FuturePlayerStart", FuturePlayerStart.DEFAULT_STAT);
-		while (start = FuturePlayerStart(it.Next()))
+		FutureInvasionPlayerStart start;
+		it = ThinkerIterator.Create("FutureInvasionPlayerStart", FutureInvasionPlayerStart.DEFAULT_STAT);
+		while (start = FutureInvasionPlayerStart(it.Next()))
 		{
 			if (start.user_InvasionID != GetID())
 				continue;
@@ -199,19 +199,19 @@ class Invasion : GameMode
 			int i;
 			for (; i < playerStarts.Size(); ++i)
 			{
-				if (playerStarts[i].GetWave() == start.Args[FuturePlayerStart.START_WAVE])
+				if (playerStarts[i].GetWave() == start.Args[FutureInvasionPlayerStart.ARG_START_WAVE])
 				{
 					break;
 				}
-				else if (playerStarts[i].GetWave() > start.Args[FuturePlayerStart.START_WAVE])
+				else if (playerStarts[i].GetWave() > start.Args[FutureInvasionPlayerStart.ARG_START_WAVE])
 				{
-					playerStarts.Insert(i, FuturePlayerStarts.Create(start.Args[FuturePlayerStart.START_WAVE]));
+					playerStarts.Insert(i, FutureInvasionPlayerStarts.Create(start.Args[FutureInvasionPlayerStart.ARG_START_WAVE]));
 					break;
 				}
 			}
 
 			if (i >= playerStarts.Size())
-				i = playerStarts.Push(FuturePlayerStarts.Create(start.Args[FuturePlayerStart.START_WAVE]));
+				i = playerStarts.Push(FutureInvasionPlayerStarts.Create(start.Args[FutureInvasionPlayerStart.ARG_START_WAVE]));
 
 			playerStarts[i].AddStart(start);
 		}
@@ -407,7 +407,7 @@ class Invasion : GameMode
 
 			int add = s.RemainingSpawns();
 			counter += add;
-			if (s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_WAIT_MONST)
+			if (s.args[InvasionSpawner.ARG_FLAGS] & InvasionSpawner.FL_WAIT_MONST)
 				thresholdCounter += add;
 		}
 		
@@ -425,7 +425,7 @@ class Invasion : GameMode
 			add = -add;
 		
 		enemies = Max(0, enemies + add);
-		if (s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_WAIT_MONST)
+		if (s.args[InvasionSpawner.ARG_FLAGS] & InvasionSpawner.FL_WAIT_MONST)
 			lastSpawnThreshold = Max(0, lastSpawnThreshold + add);
 	}
 	
@@ -459,8 +459,8 @@ class Invasion : GameMode
     {
         foreach (s : spawners)
 		{
-			s.Reset(!(s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_ALWAYS),
-					s.args[InvasionSpawner.FLAGS] & InvasionSpawner.FL_RESET);
+			s.Reset(!(s.args[InvasionSpawner.ARG_FLAGS] & InvasionSpawner.FL_ALWAYS),
+					s.args[InvasionSpawner.ARG_FLAGS] & InvasionSpawner.FL_RESET);
 
 			s.ActivateSpawner(s.ShouldActivate(wave), self);
 		}
@@ -572,10 +572,10 @@ class Invasion : GameMode
 
     override void PlayerRespawned(PlayerEvent e)
 	{
-		FuturePlayerStart spot;
+		FutureInvasionPlayerStart spot;
 		if (playerStarts.Size())
 		{
-			FuturePlayerStarts starts;
+			FutureInvasionPlayerStarts starts;
 			foreach (fps : playerStarts)
 			{
 				if (fps.GetWave() > wave)
