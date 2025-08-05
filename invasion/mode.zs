@@ -24,14 +24,19 @@ class GameMode play
 	virtual void ThingDied(WorldEvent e) {}
 	virtual void ThingDestroyed(WorldEvent e) {}
 	virtual void ThingDamaged(WorldEvent e) {}
+	virtual void ThingGrounded(WorldEvent e) {}
 	virtual void PlayerEntered(PlayerEvent e) {}
 	virtual void PlayerSpawned(PlayerEvent e) {}
+	virtual bool PlayerRespawning(PlayerEvent e) { return true; }
 	virtual void PlayerRespawned(PlayerEvent e) {}
 	virtual void PlayerDied(PlayerEvent e) {}
 	virtual void PlayerDisconnected(PlayerEvent e) {}
 	virtual void CheckReplacement(ReplaceEvent e) {}
+	virtual void CheckReplacee(ReplacedEvent e) {}
 	virtual void NetworkProcess(ConsoleEvent e) {}
+	virtual void NetworkCommandProcess(NetworkCommand cmd) {}
 	virtual ui void UITick() {}
+	virtual ui void PostUITick() {}
 	virtual ui void Draw(RenderEvent e) {}
 	virtual ui void ConsoleProcess(ConsoleEvent e) {}
 	virtual ui void InterfaceProcess(ConsoleEvent e) {}
@@ -186,6 +191,12 @@ class GameModeHandler : EventHandler
 			mode.ThingDamaged(e);
 	}
 
+	override void WorldThingGround(Worldevent e)
+	{
+		foreach (mode : gameModes)
+			mode.ThingGrounded(e);
+	}
+
 	override void PlayerEntered(PlayerEvent e)
 	{
 		foreach (mode : gameModes)
@@ -196,6 +207,17 @@ class GameModeHandler : EventHandler
 	{
 		foreach (mode : gameModes)
 			mode.PlayerSpawned(e);
+	}
+
+	override bool PlayerRespawning(PlayerEvent e)
+	{
+		foreach (mode : gameModes)
+		{
+			if (!mode.PlayerRespawning(e))
+				return false;
+		}
+
+		return true;
 	}
 
 	override void PlayerRespawned(PlayerEvent e)
@@ -222,16 +244,34 @@ class GameModeHandler : EventHandler
 			mode.CheckReplacement(e);
 	}
 
+	override void CheckReplacee(ReplacedEvent e)
+	{
+		foreach (mode : gameModes)
+			mode.CheckReplacee(e);
+	}
+
 	override void NetworkProcess(ConsoleEvent e)
 	{
 		foreach (mode : gameModes)
 			mode.NetworkProcess(e);
 	}
 
+	override void NetworkCommandProcess(NetworkCommand cmd)
+	{
+		foreach (mode : gameModes)
+			mode.NetworkCommandProcess(cmd);
+	}
+
 	override void UITick()
 	{
 		foreach (mode : gameModes)
 			mode.UITick();
+	}
+
+	override void PostUITick()
+	{
+		foreach (mode : gameModes)
+			mode.PostUITick();
 	}
 
 	override void ConsoleProcess(ConsoleEvent e)
